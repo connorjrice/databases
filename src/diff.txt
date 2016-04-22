@@ -1,0 +1,41 @@
+304208,304217c304208,304217
+< dept_no	COUNT(*)
+< d001	18426
+< d002	15579
+< d003	16071
+< d004	66675
+< d005	76958
+< d006	18295
+< d007	46922
+< d008	19285
+< d009	21813
+---
+> dept_no	count(*)
+> d001	20211
+> d002	17346
+> d003	17786
+> d004	73485
+> d005	85707
+> d006	20117
+> d007	52245
+> d008	21126
+> d009	23580
+373946c373946
+< Georgi	Facello
+---
+> Tokuyasu	Pesch
+373948c373948,373956
+< M	63810.7448
+---
+> M	63838.1769
+> F	63769.6032
+> first_name	last_name
+> Moni	Decaestecker
+> Eishiro	Kuzuoka
+> Jouni	Pocchiola
+> Supot	Remmele
+> Ronghao	Schaad
+> Kiyokazu	Whitcomb
+373951a373960,373961
+> dept_name
+> Research
