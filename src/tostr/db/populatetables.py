@@ -6,10 +6,8 @@ form = cgi.FieldStorage()
 
 import MySQLdb
 import csv
-import StringIO
 
-
-
+# Feed in all creators, likes, pictures, and users to the DB, then update likes in the pictures table.
 def populatetables(cursor):
     c=open("creators.csv")
     for row in csv.reader(c):
@@ -30,9 +28,10 @@ def populatetables(cursor):
     for row in csv.reader(u):
         if not row[0]=='id':
             adduser(cursor, row[0],row[1],row[2],row[3],row[4])
-            
+
     updatelikes(cursor)
 
+# Adds a creator from the csv file to the db
 def addcreator(cursor, uid, pid):
     try:
         cursor.execute("INSERT INTO creators VALUES(%s, %s)", (uid, pid))
@@ -41,6 +40,7 @@ def addcreator(cursor, uid, pid):
         conn.rollback()
         print "rollback"
 
+# Adds a like from the csv to the db
 def addlike(cursor, uid, pid):
     try:
         cursor.execute("INSERT INTO likes VALUES(%s, %s)", (uid, pid))
@@ -49,6 +49,7 @@ def addlike(cursor, uid, pid):
         conn.rollback()
         print "rollback"
 
+# Adds a picture from the csv file to the db
 def addpicture(cursor, uid, creatorid, likes, date, name):
     try:
         cursor.execute("INSERT INTO pictures VALUES(%s, %s, %s, %s, %s)", (uid, creatorid, likes, date, name))
@@ -56,7 +57,8 @@ def addpicture(cursor, uid, creatorid, likes, date, name):
     except:
         conn.rollback()
         print "rollback"
-  
+
+# Adds a user from the csv file to the db
 def adduser(cursor, uid, uname, bday, urealfirst, ureallast):
     try:
         cursor.execute("INSERT INTO users VALUES(%s, %s, %s, %s, %s)", (uid, uname, bday, urealfirst, ureallast))
@@ -65,6 +67,7 @@ def adduser(cursor, uid, uname, bday, urealfirst, ureallast):
         conn.rollback()
         print "rollback"
 
+# Updates all of the likes to be the sum of the likes in the likes table when the pid is equal.
 def updatelikes(cursor):
     try:
         cursor.execute("Update pictures SET likes = (select count(uid) from likes where likes.pid = pictures.id)")

@@ -1,0 +1,4 @@
+1: discover new toast (get a random toast picture)
+2: create account
+3: like a toast
+4: see who has liked a toast
