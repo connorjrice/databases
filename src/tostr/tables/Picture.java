@@ -22,6 +22,16 @@ public class Picture {
         this.name = name;
     }
     
+    public void incLikes() {
+        likes += 1;
+    }
+    
+    public void decLikes() {
+        if (likes > 0) {
+            likes -= 1;
+        }
+    }
+    
    @Override
     public String toString() {
         return id + "," + creatorid + "," + likes + "," + date + "," + name;

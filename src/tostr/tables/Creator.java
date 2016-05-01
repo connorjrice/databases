@@ -13,7 +13,7 @@ public class Creator {
     
     public int pid,uid;
     
-    public Creator(int pid, int uid) {
+    public Creator(int uid, int pid) {
         this.pid = pid;
         this.uid = uid;
     }
