@@ -16,10 +16,10 @@ public class datarun {
      */
     public static void main(String[] args) {
         datagenerator dg = new datagenerator();
-        dg.createUsers(10);
-        dg.createPictures(10);
+        dg.createUsers(5000);
+        dg.createPictures(10000);
         dg.createCreators();
-        dg.createLikes(100);
+        dg.createLikes(20000);
     }
     
 }
