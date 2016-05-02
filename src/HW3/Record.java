@@ -14,23 +14,35 @@ public class Record {
     
     private RandomAccessFile raf;
     
-    public Record() throws FileNotFoundException {
-        raf = new RandomAccessFile("test.db", "rw");        
+    public Record() {
+        //
     }
     
-    public void createTable(String table) {
-        byte[] data = table.getBytes();
+    public void createTable(Object table) {
+        byte[] data = table.toString().getBytes();
+
         try {
-            raf.write(data);
+            raf = new RandomAccessFile("test.db", "rw");
+            raf.seek(raf.length());
+            for (byte b : data) {
+                raf.writeByte(b);
+            }
+            raf.close();
         } catch (IOException ex) {
             Logger.getLogger(Record.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
-    public void insertRecord(String record) {
-        byte[] data = record.getBytes();
+    public void insertRecord(Object record) {
+        byte[] data = record.toString().getBytes();
         try {
-            raf.write(data);
+            raf = new RandomAccessFile("test.db", "rw");
+            raf.seek(raf.length());
+            for (byte b : data) {
+                raf.writeByte(b);                
+            }
+
+            raf.close();
         }  catch (IOException ex) {
             Logger.getLogger(Record.class.getName()).log(Level.SEVERE, null, ex);
         }

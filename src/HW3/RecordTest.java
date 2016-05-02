@@ -14,8 +14,8 @@ public class RecordTest {
         r.insertRecord("yuliya,f,23");
         r.insertRecord("boris,m,3");
         r.insertRecord("clara,f,3");        
-        r.modifyRecord("yuliya,f,23", "yuliya,f,24");
-        r.deleteRecord("connor,m,24");
+        //r.modifyRecord("yuliya,f,23", "yuliya,f,24");
+        //r.deleteRecord("connor,m,24");
         r.printTableBytes();
     }
     
