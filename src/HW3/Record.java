@@ -45,6 +45,7 @@ public class Record {
     private void addKey(StringBuilder sb, byte[] keydata) {
         sb.append(TKEY_BEG);
         for (byte b : keydata) {
+            System.out.println(String.format("%02X", b));
             sb.append(String.format("%02X", b));
         }
         sb.append(TKEY_END);
@@ -92,7 +93,6 @@ public class Record {
             Logger.getLogger(Record.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
 
     
     public void findRecord(String query, String key) {
@@ -101,33 +101,33 @@ public class Record {
         byte[] querydata = query.getBytes();
         try {
             RandomAccessFile raf = new RandomAccessFile("test.db", "rw");
-            long length = raf.length()-1;
-            long position = 0;
-            boolean queryfound = false;
-            while (position < length && !queryfound) {
-                position = findFirstTuple(raf, keydata);
-                raf.seek(position);
-                byte[] relation = getRelation(raf);
-                
-                // At this point we are looking at the first relation
-                if (byteCompare(raf, query.getBytes())) { // If we find our query
-                    byte b = raf.readByte();
-                    ArrayList<Byte> a = new ArrayList<>();
-                    while (b != REL_END) {
-                        a.add(b);
-                        b = raf.readByte();
+            raf.seek(0);
+            raf.seek(findFirstTuple(raf,keydata)); // Roll to first tuple
+            byte[] relation = getRelation(raf);
+            if (relation.length > 0) {
+                // If relation contains querydata
+                if (contains(relation, querydata)) {
+                    System.out.println("here");
+                    for (byte b : relation) {
+                        record.append(Integer.toHexString(b));
                     }
-                } else { // Move on to next
-                    
                 }
-                raf.close();
-            } 
+            }
+            // go to next relation
+            
+            raf.close();
         } catch (IOException ex) {
             Logger.getLogger(Record.class.getName()).log(Level.SEVERE, null, ex);
         }
         Logger.getLogger(Record.class.getName()).log(Level.INFO, record.toString());
     }
     
+    /**
+     * Return true if b is a subset of a
+     * @param a
+     * @param b
+     * @return 
+     */
     private boolean contains(byte[] a, byte[] b) {
         boolean contains = false;
         for (int i = 0; i < a.length; i++) {
@@ -140,22 +140,24 @@ public class Record {
     
     
     private byte[] getRelation(RandomAccessFile raf) throws IOException {
-        long position = raf.getFilePointer();
         int relationLength = getRelationLength(raf);
         byte[] relation = new byte[relationLength];
-        if (relation.length > 0) {
-            for (int i = 0; i < relationLength; i++) {
-                relation[i] = raf.readByte();
-            }
+        for (int i = 0; i < relationLength; i++) {
+            relation[i] = raf.readByte();
         }
         return relation;
-        
     }
     
+    /**
+     * NEEDS TO ROLL BACK TO START POSITION.
+     * @param raf
+     * @return
+     * @throws IOException 
+     */
     private int getRelationLength(RandomAccessFile raf) throws IOException {
         long position = raf.getFilePointer();
         int count = 0;
-        raf.seek(position-1);
+        raf.seek(position-1); // We can do this because we know we're in a relation.
         byte b = raf.readByte();
         if (b == REL_BEG) {
             while (b != REL_END) {
@@ -163,6 +165,7 @@ public class Record {
                 count++;
             }
         }
+        raf.seek(position);
         return count;
     }
     
@@ -179,11 +182,11 @@ public class Record {
     private long findFirstTuple(RandomAccessFile raf, byte[] keydata) throws IOException {
         try {
             //position = raf.getFilePointer();
-            byte b = raf.readByte();
+            byte b = raf.read();
             if (b == TKEY_BEG) {
                 if (byteCompare(raf, keydata)) {
                     while (b != TKEY_END) {
-                        b = raf.readByte();
+                        b = raf.read();
                     }
                     if (b == TAB_BEG) {
                         while (b != TAB_END) {
@@ -206,6 +209,7 @@ public class Record {
         }
         return raf.getFilePointer();
     }
+    
     
     /**
      * Compares the current place of raf to the byte[] data
