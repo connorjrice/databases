@@ -15,14 +15,16 @@ import java.util.logging.Logger;
 public class Record {
     
     // These are all used for enclosing data
-    public final byte TAB_BEG = 33;  
-    public final byte TAB_END = 35;
-    public final byte TKEY_BEG = 40; // Table key
-    public final byte TKEY_END = 41;
-    public final byte REL_BEG = 2;
-    public final byte REL_END = 3;
+    public final byte TAB_BEG = 5;  
+    public final byte TAB_END = 6;
+    public final byte TKEY_BEG = 2; // Table key
+    public final byte TKEY_END = 3;
+    public final byte REL_BEG = 4;
+    public final byte REL_END = 5;
     
     public Record() {
+        
+        
         try {
             Files.delete(Paths.get("test.db"));
         } catch (IOException ex) {
@@ -43,20 +45,21 @@ public class Record {
     }
     
     private void addKey(StringBuilder sb, byte[] keydata) {
-        sb.append(TKEY_BEG);
+        sb.append(TKEY_BEG).append(" ");
         for (byte b : keydata) {
-            System.out.println(String.format("%02X", b));
-            sb.append(String.format("%02X", b));
+            sb.append(b).append(" ");
         }
-        sb.append(TKEY_END);
+        sb.append(TKEY_END).append(" ");
+        sb.append("\n");
     }
     
     private void addSchema(StringBuilder sb, byte[] tabledata) {
-        sb.append(TAB_BEG);
+        sb.append(TAB_BEG).append(" ");
         for (byte b : tabledata) {
-            sb.append(String.format("%02X", b));
+            sb.append(b).append(" ");
         }
-        sb.append(TAB_END);
+        sb.append(TAB_END).append(" ");
+        sb.append("\n");
     }
     
     private void writeTable(StringBuilder sb) {
@@ -77,14 +80,19 @@ public class Record {
         byte[] data = record.toString().getBytes();
         
         StringBuilder sb = new StringBuilder();
+        sb.append(REL_BEG).append(" ");
         for (byte b : data) {
-            sb.append(String.format("%02X", b));
+            sb.append(b).append(" ");
         }
+        sb.append(REL_END).append(" ");
+        sb.append("\n");
         byte[] converted = sb.toString().getBytes();
+        
         try {
             try (RandomAccessFile raf = new RandomAccessFile("test.db", "rw")) {
                 raf.seek(raf.length());
                 for (byte b : converted) {
+                    System.out.println(b);
                     raf.writeByte(b);
                 }
                 raf.close();
@@ -101,8 +109,10 @@ public class Record {
         byte[] querydata = query.getBytes();
         try {
             RandomAccessFile raf = new RandomAccessFile("test.db", "rw");
+
             raf.seek(0);
-            raf.seek(findFirstTuple(raf,keydata)); // Roll to first tuple
+            System.out.println(raf.readByte());
+          /*  raf.seek(findFirstTuple(raf,keydata)); // Roll to first tuple
             byte[] relation = getRelation(raf);
             if (relation.length > 0) {
                 // If relation contains querydata
@@ -114,7 +124,7 @@ public class Record {
                 }
             }
             // go to next relation
-            
+            */
             raf.close();
         } catch (IOException ex) {
             Logger.getLogger(Record.class.getName()).log(Level.SEVERE, null, ex);
@@ -182,11 +192,11 @@ public class Record {
     private long findFirstTuple(RandomAccessFile raf, byte[] keydata) throws IOException {
         try {
             //position = raf.getFilePointer();
-            byte b = raf.read();
+            byte b = raf.readByte();
             if (b == TKEY_BEG) {
                 if (byteCompare(raf, keydata)) {
                     while (b != TKEY_END) {
-                        b = raf.read();
+                        b = raf.readByte();
                     }
                     if (b == TAB_BEG) {
                         while (b != TAB_END) {
