@@ -103,11 +103,20 @@ public class DBMS<E> {
         index.clear();
         try (RandomAccessFile raf = new RandomAccessFile("test.db", "rw")) {
             raf.seek(0);
-            while (raf.getFilePointer() < raf.length()) {
-                String s = raf.readLine().trim();
-                decide(s, parse(s));
-            }
-            raf.close();
+                //String s = raf.readLine().trim();
+                StringBuilder sb = new StringBuilder();
+                char c;
+                while (raf.getFilePointer() < raf.length()) {
+                    while ((c = raf.readChar()) != '\n'){
+                        sb.append(c);
+                    }
+                    decide(sb.toString().trim(), parse(sb.toString().trim()));
+                    sb = new StringBuilder();
+                    
+                }
+                
+
+                raf.close();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -143,7 +152,9 @@ public class DBMS<E> {
             // Put a table together if we have a tempKey
             if (tempKey.length() > 0) { 
                 // Fix our input so that Java doesn't throw ClassNotFound
-                String[] pairs = fixString(s);
+                //String[] pairs = fixString(s);
+                s = s.substring(1, s.length()-1);
+                String[] pairs = s.split(",");
                 HashMap<E, Class<E>> attributes = new HashMap();
                 for (String d : pairs) {
                     String[] pair = d.split("6");
@@ -167,13 +178,7 @@ public class DBMS<E> {
         }
     }
     
-    private String[] fixString(String s) {
-        String fixed = s.trim();                
-        fixed = fixed.substring(1,fixed.length()-1);
-        byte[] parsed = StringUtils.getBytesUtf8(fixed);
-        return StringUtils.newStringUtf8(parsed).split(","); 
-    }
-    
+
     
     private String readKey(String s) {
         if (s.startsWith("2") && s.endsWith("3")) {
@@ -189,9 +194,11 @@ public class DBMS<E> {
         try (RandomAccessFile raf = new RandomAccessFile("test.db", "rw")) {
             for (Table t : tables) {
                 String s = t.toString();
-                for (char c : s.toCharArray()) {
-                    raf.write(c);
-                }
+
+                raf.writeChars(s);
+                /*for (char c : s.toCharArray()) {
+                    raf.writeChar(c);
+                }*/
             }
             raf.close();
         } catch (FileNotFoundException ex) {
