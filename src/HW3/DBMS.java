@@ -22,14 +22,14 @@ import java.util.logging.Logger;
  * @author Connor
  */
 public class DBMS<E> {
-        // These are all used for enclosing data
-    public static final byte TAB_BEG = 5;  
-    public static final byte TAB_END = 6;
-    public static final byte TKEY_BEG = 2; // Table key
-    public static final byte TKEY_END = 3;
+    // These are all used for enclosing data
+    public static final byte TKEY_BEG = 0; // Table key
+    public static final byte TKEY_END = 1;
+    public static final byte TAB_BEG = 2;  
+    public static final byte TAB_END = 3;
     public static final byte REL_BEG = 4;
     public static final byte REL_END = 5;
-    public static final byte TYPE_SEP = 8;
+    public static final byte TYPE_SEP = 6;
 
     private final ArrayList<Table> tables;
     private final HashMap index;
@@ -37,25 +37,36 @@ public class DBMS<E> {
     private String tempKey = "";
     
     public DBMS() {
-       try {
+        this.tables = new ArrayList<>();
+        this.index = new HashMap();
+    }    
+    
+    public void delete() {
+        try {
             Files.delete(Paths.get("test.db"));
         } catch (IOException ex) {
             Logger.getLogger(Record.class.getName()).log(Level.SEVERE, null, ex);
         }
-        this.tables = new ArrayList<>();
-        this.index = new HashMap();
-    }    
+    }
     
      /**
      * Create a new table.
      * @param attributes
      * @param key: key to find table
      */
-    public void createTable(String[] attributes, String key) {
-        StringBuilder sb = new StringBuilder();
-        Table t = new Table(attributes, key);
-        tables.add(t);
-        index.put(key, t);
+    public void createTable(E[] values, Class<E>[] types, String key) {
+        if (values.length == types.length) {
+            HashMap<E, Class<E>> attributes = new HashMap();
+            for (int i = 0; i < values.length; i++) {
+                attributes.put(values[i], types[i]);
+            }
+            Table t = new Table(attributes, key);
+            tables.add(t);
+            index.put(key, t);
+        } else {
+            Logger.getLogger(Record.class.getName()).log(Level.SEVERE, "Table "
+                    + "creation error: inequal number of values and types.");
+        }
     }
     
     public <E extends Comparable<? super E>> void insertRecord(String key, 
@@ -87,9 +98,10 @@ public class DBMS<E> {
         tables.clear();
         index.clear();
         try (RandomAccessFile raf = new RandomAccessFile("test.db", "rw")) {
+            raf.seek(0);
             while (raf.getFilePointer() < raf.length()) {
-                String s = raf.readLine();
-                decide(s.substring(1,s.length()-1), parse(s));
+                String s = raf.readLine().trim();
+                decide(s, parse(s));
             }
             raf.close();
         } catch (FileNotFoundException ex) {
@@ -100,23 +112,33 @@ public class DBMS<E> {
     }
     
     private int parse(String s) {
-        if (s.startsWith("2") && s.endsWith("3")) {
+/*        byte[] bytes = s.getBytes();
+        for (byte b : bytes) {
+            System.out.println(b);
+        }*/if (s.startsWith("0") && s.endsWith("1")) {
             return 0; // key
-        } else if (s.startsWith("4") && s.endsWith("5")) {
+        } else if (s.startsWith("2") && s.endsWith("3")) {
             return 1; // table
-        } else if (s.startsWith("6") && s.endsWith("7")) {
+        } else if (s.startsWith("4") && s.endsWith("5")) {
             return 2; // relation
         } else {
             return -1;   
         }
     }
     
+    /**
+     * Remember: we are being passed the string without special chars.
+     * @param s
+     * @param i 
+     */
     private void decide(String s, int i) {
         if (i == 0) { // key
             tempKey = s;
         } else if (i == 1) { // table
-            if (tempKey.length() > 0) {
-                
+            if (tempKey.length() > 0) { // if we have a tempKey
+                String[] data = s.split(",");
+                System.out.println(data.toString());
+                tempKey = "";
             } else {
                 Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, "Parsing error: no temp key but found table.");
             }
@@ -143,7 +165,7 @@ public class DBMS<E> {
             for (Table t : tables) {
                 String s = t.toString();
                 for (char c : s.toCharArray()) {
-                    raf.writeChar(c);
+                    raf.writeInt(c);
                 }
             }
             raf.close();

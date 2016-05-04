@@ -8,14 +8,15 @@ public class RecordTest {
     
     public static void main(String[] args) {
         write();
-//        read();
-
+        read();
     }
     
-    public static void write() {
+    public static <E extends Comparable> void write() {        
         DBMS d = new DBMS();
-        String[] table = {"name","sex","age"};
-        d.createTable(table, "info");
+        d.delete();
+        String[] values = {"name","sex","age"};
+        Class<?>[] types = {String.class, String.class, String.class};
+        d.createTable(values, types, "info");
         String[] record = {"connor", "m", "23"};
         d.insertRecord("info", record);
         d.findRecord("info", "connor");
@@ -31,7 +32,7 @@ public class RecordTest {
     public static void hw() {
         DBMS d = new DBMS();
         String[] table = {"name","sex","age"};
-        d.createTable(table, "info");
+//        d.createTable(table, "info");
         String[] record = {"connor", "m", "23"};
         d.insertRecord("info", record);
         d.findRecord("info", "connor");

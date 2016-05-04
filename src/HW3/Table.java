@@ -2,6 +2,7 @@ package HW3;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 /**
  *
@@ -44,11 +45,13 @@ public class Table<E> {
         s += "\n";
         
         s += DBMS.TAB_BEG;
-        for (E e : attributes.keySet()) {
-            s += e.toString() + ", ";
+        for (Entry<E, Class<E>> e : attributes.entrySet()) {
+            s += e.getKey().toString() + DBMS.TYPE_SEP;
+            String class_ = e.getValue().toString().split(" ")[1];
+            s += class_ + ", ";
         }
         
-        s = s.substring(0,s.length()-2);
+        s = s.substring(0,s.length()-2);//remove last ", "
         s += DBMS.TAB_END;
         s += "\n";        
         
