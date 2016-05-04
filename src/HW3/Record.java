@@ -3,24 +3,29 @@ package HW3;
 /**
  * TKEY_BEG*keyvalue*TKEY_END*TAB_BEG*REL_BEG*...*REL_END*TAB_END*
  * @author Connor
+ * @param <E>
  */
-public class Record {
+public class Record<E> {
     
-    private Object[] members;    
+    private final E[] members;    
     
-    public Record(Object[] members) {
+    public Record(E[] members) {
         this.members = members;
     }
     
-    public Object get(int index) {
+    public E get(int index) {
         return members[index];
+    }
+    
+    public <E extends Comparable> E[] getMembers() {
+        return (E[]) members;
     }
     
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (Object o : members) {
-            sb.append(o.toString());
+        for (E e : members) {
+            sb.append(e.toString());
         }
         return sb.toString();
     }

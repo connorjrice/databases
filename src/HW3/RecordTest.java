@@ -8,10 +8,11 @@ public class RecordTest {
     
     public static void main(String[] args) {
         DBMS d = new DBMS();
-        String table = "name,sex,age";
+        String[] table = {"name","sex","age"};
         d.createTable(table, "info");
-        d.insertRecord("connor,m,24");
-        d.findRecord("connor,m,24", "info");
+        String[] record = {"connor", "m", "23"};
+        d.insertRecord("info", record);
+        d.findRecord("info", "connor");
         /*d.insertRecord("yuliya,f,23");
         d.insertRecord("boris,m,3");
         d.insertRecord("clara,f,3"); 
