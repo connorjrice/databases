@@ -8,12 +8,16 @@ package HW3;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.codec.binary.StringUtils;
 
 
 
@@ -132,12 +136,26 @@ public class DBMS<E> {
      * @param i 
      */
     private void decide(String s, int i) {
-        if (i == 0) { // key
+        if (i == 0) { 
+            // s is a key, store it
             tempKey = s;
-        } else if (i == 1) { // table
-            if (tempKey.length() > 0) { // if we have a tempKey
-                String[] data = s.split(",");
-                System.out.println(data.toString());
+        } else if (i == 1) { 
+            // Put a table together if we have a tempKey
+            if (tempKey.length() > 0) { 
+                // Fix our input so that Java doesn't throw ClassNotFound
+                String[] pairs = fixString(s);
+                HashMap<E, Class<E>> attributes = new HashMap();
+                for (String d : pairs) {
+                    String[] pair = d.split("6");
+                    pair[1] = pair[1].trim();
+                    try {
+                        Class<E> type = (Class<E>) Class.forName(pair[1]);
+                        attributes.put((E)pair[0], type);
+                    } catch (ClassNotFoundException ex) {
+                        Logger.getLogger(DBMS.class.getName())
+                                .log(Level.SEVERE, null, ex);
+                    }
+                }
                 tempKey = "";
             } else {
                 Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, "Parsing error: no temp key but found table.");
@@ -147,6 +165,13 @@ public class DBMS<E> {
         } else {
             Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, "Parsing error: invalid decision value.");
         }
+    }
+    
+    private String[] fixString(String s) {
+        String fixed = s.trim();                
+        fixed = fixed.substring(1,fixed.length()-1);
+        byte[] parsed = StringUtils.getBytesUtf8(fixed);
+        return StringUtils.newStringUtf8(parsed).split(","); 
     }
     
     
@@ -165,7 +190,7 @@ public class DBMS<E> {
             for (Table t : tables) {
                 String s = t.toString();
                 for (char c : s.toCharArray()) {
-                    raf.writeInt(c);
+                    raf.write(c);
                 }
             }
             raf.close();
