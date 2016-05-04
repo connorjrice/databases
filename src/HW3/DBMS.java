@@ -5,7 +5,9 @@
  */
 package HW3;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -21,30 +23,32 @@ import java.util.logging.Logger;
  */
 public class DBMS<E> {
         // These are all used for enclosing data
-    public final byte TAB_BEG = 5;  
-    public final byte TAB_END = 6;
-    public final byte TKEY_BEG = 2; // Table key
-    public final byte TKEY_END = 3;
-    public final byte REL_BEG = 4;
-    public final byte REL_END = 5;
+    public static final byte TAB_BEG = 5;  
+    public static final byte TAB_END = 6;
+    public static final byte TKEY_BEG = 2; // Table key
+    public static final byte TKEY_END = 3;
+    public static final byte REL_BEG = 4;
+    public static final byte REL_END = 5;
+    public static final byte TYPE_SEP = 8;
 
     private final ArrayList<Table> tables;
     private final HashMap index;
     
+    private String tempKey = "";
     
     public DBMS() {
-        /*try {
+       try {
             Files.delete(Paths.get("test.db"));
         } catch (IOException ex) {
             Logger.getLogger(Record.class.getName()).log(Level.SEVERE, null, ex);
-        }*/
+        }
         this.tables = new ArrayList<>();
         this.index = new HashMap();
     }    
     
      /**
      * Create a new table.
-     * @param table: schema
+     * @param attributes
      * @param key: key to find table
      */
     public void createTable(String[] attributes, String key) {
@@ -65,21 +69,92 @@ public class DBMS<E> {
     public void findRecord(String key, E member) {
         Table t = findTable(key);
         if (t != null) {
-            t.getRecords().stream().forEach((r) -> {
-                for (Object o : r.getMembers()) {
+            // The complexity of this is terribad.
+            for (Object r : t.getRecords()) {
+                Record rec = (Record) r;
+                for (Object o : rec.getMembers()) {
                     if (o.hashCode() == member.hashCode()) {
                         Logger.getLogger(Record.class.getName()).log(Level.INFO, r.toString());
                     }
                 }
-            });
+            }
         } else {
             Logger.getLogger(Record.class.getName()).log(Level.INFO, "Record not found.");
         }
-        
+    }
+    
+    public void readDB() {
+        tables.clear();
+        index.clear();
+        try (RandomAccessFile raf = new RandomAccessFile("test.db", "rw")) {
+            while (raf.getFilePointer() < raf.length()) {
+                String s = raf.readLine();
+                decide(s.substring(1,s.length()-1), parse(s));
+            }
+            raf.close();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private int parse(String s) {
+        if (s.startsWith("2") && s.endsWith("3")) {
+            return 0; // key
+        } else if (s.startsWith("4") && s.endsWith("5")) {
+            return 1; // table
+        } else if (s.startsWith("6") && s.endsWith("7")) {
+            return 2; // relation
+        } else {
+            return -1;   
+        }
+    }
+    
+    private void decide(String s, int i) {
+        if (i == 0) { // key
+            tempKey = s;
+        } else if (i == 1) { // table
+            if (tempKey.length() > 0) {
+                
+            } else {
+                Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, "Parsing error: no temp key but found table.");
+            }
+        } else if (i == 2) { // relation
+            
+        } else {
+            Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, "Parsing error: invalid decision value.");
+        }
+    }
+    
+    
+    private String readKey(String s) {
+        if (s.startsWith("2") && s.endsWith("3")) {
+            return s.substring(1,s.length()-1);
+        }
+        else {
+            return "nokey";
+        }
+    }
+    
+    
+    public void writeDB() {
+        try (RandomAccessFile raf = new RandomAccessFile("test.db", "rw")) {
+            for (Table t : tables) {
+                String s = t.toString();
+                for (char c : s.toCharArray()) {
+                    raf.writeChar(c);
+                }
+            }
+            raf.close();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     private Table findTable(String key) {
-        System.out.println(index.keySet());
         return (Table) index.get(key);
     }
     

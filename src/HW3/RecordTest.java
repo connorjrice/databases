@@ -7,12 +7,35 @@ package HW3;
 public class RecordTest {
     
     public static void main(String[] args) {
+        write();
+//        read();
+
+    }
+    
+    public static void write() {
         DBMS d = new DBMS();
         String[] table = {"name","sex","age"};
         d.createTable(table, "info");
         String[] record = {"connor", "m", "23"};
         d.insertRecord("info", record);
         d.findRecord("info", "connor");
+        d.writeDB();
+    }
+    
+    public static void read() {
+        DBMS d = new DBMS();
+        d.readDB();
+        d.findRecord("info", "connor");
+    }
+    
+    public static void hw() {
+        DBMS d = new DBMS();
+        String[] table = {"name","sex","age"};
+        d.createTable(table, "info");
+        String[] record = {"connor", "m", "23"};
+        d.insertRecord("info", record);
+        d.findRecord("info", "connor");
+
         /*d.insertRecord("yuliya,f,23");
         d.insertRecord("boris,m,3");
         d.insertRecord("clara,f,3"); 

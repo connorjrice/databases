@@ -1,25 +1,19 @@
 package HW3;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  *
  * @author Connor
  */
-public class Table {
-
-    private final byte TAB_BEG = 5;  
-    private final byte TAB_END = 6;
-    private final byte TKEY_BEG = 2; // Table key
-    private final byte TKEY_END = 3;
-    private final byte REL_BEG = 4;
-    private final byte REL_END = 5;
+public class Table<E> {
     
     private final ArrayList<Record> values;
-    private final String[] attributes;
+    private final HashMap<E, Class<E>> attributes;
     private final String key;
     
-    public Table(String[] attributes, String key) {
+    public Table(HashMap<E, Class<E>> attributes, String key) {
         this.attributes = attributes;
         this.key = key;
         this.values = new ArrayList<>();
@@ -37,25 +31,32 @@ public class Table {
         return values;
     }
     
-    public String[] getAttributes() {
+    public HashMap<E, Class<E>> getAttributes() {
         return attributes;
     }
     
     @Override
     public String toString() {
         String s = "";
-        s += TKEY_BEG;
+        s += DBMS.TKEY_BEG;
         s += key;        
-        s += TKEY_END;
+        s += DBMS.TKEY_END;
+        s += "\n";
         
-        s += TAB_BEG;
-        s += attributes;
-        s += TAB_END;
+        s += DBMS.TAB_BEG;
+        for (E e : attributes.keySet()) {
+            s += e.toString() + ", ";
+        }
+        
+        s = s.substring(0,s.length()-2);
+        s += DBMS.TAB_END;
+        s += "\n";        
         
         for (Record r : values) {
-            s += REL_BEG;
+            s += DBMS.REL_BEG;
             s += r.toString();
-            s += REL_END;
+            s += DBMS.REL_END;
+            s += "\n";            
         }
         
         return s;

@@ -17,17 +17,17 @@ public class Record<E> {
         return members[index];
     }
     
-    public <E extends Comparable> E[] getMembers() {
-        return (E[]) members;
+    public E[] getMembers() {
+        return members;
     }
     
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for (E e : members) {
-            sb.append(e.toString());
+            sb.append(e.toString()).append(", ");
         }
-        return sb.toString();
+        return sb.toString().substring(0, sb.length()-2);
     }
 
     
