@@ -7,17 +7,18 @@ package HW3;
 public class RecordTest {
     
     public static void main(String[] args) {
-        Record r = new Record();
+        DBMS d = new DBMS();
         String table = "name,sex,age";
-        r.createTable(table, "info");
-        r.insertRecord("connor,m,24");
-        r.insertRecord("yuliya,f,23");
-        r.insertRecord("boris,m,3");
-        r.insertRecord("clara,f,3"); 
-        r.findRecord("connor,m,24", "info");
+        d.createTable(table, "info");
+        d.insertRecord("connor,m,24");
+        d.findRecord("connor,m,24", "info");
+        /*d.insertRecord("yuliya,f,23");
+        d.insertRecord("boris,m,3");
+        d.insertRecord("clara,f,3"); 
+        d.findRecord("connor,m,24", "info");
         //r.modifyRecord("yuliya,f,23", "yuliya,f,24");
         //r.deleteRecord("connor,m,24");
-        r.printTableBytes();
+        d.printTableBytes();*/
     }
     
 }
