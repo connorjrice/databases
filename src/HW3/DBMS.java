@@ -1,5 +1,6 @@
 package HW3;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,13 +30,18 @@ public class DBMS<E> {
 
     private final DBIO io;
     
+    
     private final String db,index;
+    private ArrayList<Table> tables;
     
     public DBMS(String db, String index) {
         this.db = db;
         this.index = index;
         this.io = new DBIO(db, index);
+        this.tables = new ArrayList<>();
     }
+    
+    
     /**
      * Create a new table.
      * @param attributes
@@ -49,6 +55,7 @@ public class DBMS<E> {
                 attributes.put(values[i], types[i]);
             }
             Table t = new Table(attributes, key);
+            tables.add(t);
             io.write(t.toString(), "-1", key);
         } else {
             Logger.getLogger(Record.class.getName()).log(Level.SEVERE, "Table "
@@ -60,10 +67,7 @@ public class DBMS<E> {
         
     }
     
-    public int getHash(String key, String record) {
-        return (key + record).hashCode();
-    }
-    
+
     public <E extends Comparable<? super E>> void insertRecord(String tablekey, 
             E[] members, int primaryindex) {
         // TODO: Check to see if members matches schema
@@ -86,9 +90,6 @@ public class DBMS<E> {
     public void delete() {
         io.delete();
     }
-    
-    public void readDB() {
-        io.readIndices();
-    }
+
     
 }

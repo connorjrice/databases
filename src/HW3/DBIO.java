@@ -10,11 +10,9 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,7 +45,7 @@ public class DBIO<E> {
             positions.put(db, rafs.get(db).length());
             rafs.put(ind, new RandomAccessFile(ind, "rw"));
             positions.put(ind, rafs.get(ind).length());
-            buildIndices();
+            //buildIndices();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -102,19 +100,6 @@ public class DBIO<E> {
         }
     }
     
-    public void writeDB(ArrayList<Table> tables) {
-        try (RandomAccessFile raf = new RandomAccessFile("test.db", "rw")) {
-            for (Table t : tables) {
-                String s = bytesToHex(t.toString().getBytes());
-                raf.writeUTF(s);
-            }
-            raf.close();
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
     
     public static String toHexString(byte[] bytes) {
         return DatatypeConverter.printHexBinary(bytes);
