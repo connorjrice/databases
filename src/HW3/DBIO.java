@@ -8,6 +8,8 @@ package HW3;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -23,23 +25,69 @@ import java.util.logging.Logger;
  */
 public class DBIO<E> {
     private String tempKey = "";
-    private static final Set<Character> values = new HashSet<Character>(Arrays.asList(DBMS.IND_END, DBMS.REL_END, DBMS.TAB_END, DBMS.TKEY_END));
+    private static final Set<Byte> VALUES = new HashSet<>(Arrays.asList(DBMS.IND_END, DBMS.REL_END, DBMS.TAB_END, DBMS.TKEY_END));
+    private RandomAccessFile dbfile, indfile;
+    private long curDBPos;    
+    private long curIndPos;    
+
+    private final HashMap index; // Each element is a hashmap for a specific table.
+    private final HashMap<String, Integer> tableIndices; // Key, Index in indices
+    private final ArrayList<Table> tables;
+
+    public DBIO(String db, String ind)     {
+        this.index = new HashMap<>();
+        this.curDBPos = 0l;
+        
+        this.tableIndices = new HashMap<>();
+        tables = new ArrayList<>();
+        try {
+            this.dbfile = new RandomAccessFile(db, "rw");
+            this.indfile = new RandomAccessFile(ind, "rw");
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
     
-    public void readDB(ArrayList tables, HashMap indices) {
-        tables.clear();
-        indices.clear();
-        try (RandomAccessFile raf = new RandomAccessFile("test.db", "rw")) {
-            raf.seek(0);
-                StringBuilder sb = new StringBuilder();
-                char c;
-                while (raf.getFilePointer() < raf.length()) {
-                    while (!values.contains(c = raf.readChar())){
-                        sb.append(c);
-                    }
-                    decide(sb.toString().trim(), parse(sb.toString().trim()));
-                    sb = new StringBuilder();
+    
+    public void delete() {
+        try {
+            Files.delete(Paths.get("test.db"));
+        } catch (IOException ex) {
+            Logger.getLogger(Record.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }    
+    
+    public void createTable(Table t) {
+        tableIndices.put(key, tableIndices.size());
+            index.put("Attributes", );
+            updateCurPosition(getBytes(t.toString());
+    }
+    
+    public void insertRecord(Record r) {
+        // Add record to indices
+        index.get(tableIndices.get(tablekey)).put(members[primaryindex], curDBPos);
+        updateCurPosition(getBytes(r));        
+    }
+    
+    public void readDB() {
+
+        try {
+            dbfile.seek(0);
+       
+            StringBuilder sb = new StringBuilder();
+            char c;
+            while (dbfile.getFilePointer() < dbfile.length()) {
+                byte[] bytes = dbfile.readLine().getBytes();
+                int i = 0;
+                while (!VALUES.contains(bytes[i]) && i < bytes.length-1){
+                    sb.append(bytes[i]);
+                    i++;
                 }
-                raf.close();
+                decide(sb.toString().trim(), parse(sb.toString().trim()));
+                sb = new StringBuilder();
+            }
+            dbfile.close();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -109,7 +157,10 @@ public class DBIO<E> {
     public void writeDB(ArrayList<Table> tables) {
         try (RandomAccessFile raf = new RandomAccessFile("test.db", "rw")) {
             for (Table t : tables) {
-                raf.writeChars(t.toString());
+                byte[] bytes = t.toString().getBytes();
+                for (byte b : bytes){
+                    raf.write(b);
+                }
             }
             raf.close();
         } catch (FileNotFoundException ex) {
@@ -131,5 +182,10 @@ public class DBIO<E> {
             Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    
+    private void updateCurPosition(long numBytes) {
+        curDBPos += numBytes;
+    }    
     
 }

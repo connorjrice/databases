@@ -7,10 +7,14 @@ package HW3;
  */
 public class Record<E> {
     
-    private final E[] members;    
+    private final E[] members;
+    private final String tablekey;    
+    private final int primary;
     
-    public Record(E[] members) {
+    public Record(E[] members, String tablekey, int primary) {
         this.members = members;
+        this.tablekey = tablekey;
+        this.primary = primary;
     }
     
     public E get(int index) {
@@ -21,11 +25,22 @@ public class Record<E> {
         return members;
     }
     
+    public int getPrimary() {
+     return primary;   
+    }
+    
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (E e : members) {
-            sb.append(e.toString()).append(", ");
+        sb.append(tablekey);
+        for (int i = 0; i < members.length; i++) {
+            sb.append(DBMS.REL_BEG);
+            if (i == members.length-1) {
+                sb.append(members[i].toString());
+            } else {
+                sb.append(members[i].toString()).append(", ");                
+            }
+            sb.append(DBMS.REL_END);
         }
         return sb.toString().substring(0, sb.length()-2);
     }

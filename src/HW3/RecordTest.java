@@ -7,30 +7,30 @@ package HW3;
 public class RecordTest {
     
     public static void main(String[] args) {
-        write();
-        read();
+        DBMS d = new DBMS("test.db", "index.db");
+        write(d);
+        read(d);
     }
     
-    public static <E extends Comparable> void write() {        
-        DBMS d = new DBMS();
+    public static <E extends Comparable> void write(DBMS d) {        
         d.delete();
         String[] values = {"name","sex","age"};
         Class<?>[] types = {String.class, String.class, String.class};
         d.createTable(values, types, "info");
         String[] record = {"connor", "m", "23"};
-        d.insertRecord("info", record);
+        d.insertRecord("info", record, 1);
         d.findRecord("info", "connor");
         d.writeDB();
     }
     
-    public static void read() {
-        DBMS d = new DBMS();
+    public static void read(DBMS d) {
+
         d.readDB();
         d.findRecord("info", "connor");
     }
     
-    public static void hw() {
-        DBMS d = new DBMS();
+    public static void hw(DBMS d) {
+
         String[] table = {"name","sex","age"};
 //        d.createTable(table, "info");
         String[] record = {"connor", "m", "23"};
