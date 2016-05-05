@@ -60,9 +60,11 @@ public class Data<E>  {
 
         labels = "| " + getLabels(t) + "|\n";
         record = "| " + getRecord(t, tablekey) + "|\n";
+        sb.append(record);                            
         sb.append("| ").append((String) t[0]).append("|\n");                    
+
         sb.append(labels);            
-        sb.append(record);            
+
 
 	sb.append(border);
         return sb.toString();
@@ -149,20 +151,21 @@ public class Data<E>  {
     private <E extends Comparable<? super E>> String getRecord(Object[] t,
             String primarykey) {
         StringBuilder sb = new StringBuilder();        
-
+        int horizontalspaces = ((String) t[0]).length();
+        for (int i = 0; i < horizontalspaces/8; i++) {
+            sb.append(" ");
+        }
         // Add a class cast exception to check for tom foolery (ArrayList<Integer>t[2]).
         // positions.size() = members.length
-        for (int i = ((ArrayList<Integer>)t[1]).size()/4; i < 
-                (((ArrayList<Integer>)t[1]).size()/(4)*3); i++) {
+        for (int i = 0; i < horizontalspaces/8; i++) {
             sb.append(" ");
         }
         
-        sb.append(primarykey);
-        for (int i = (((ArrayList<Integer>)t[1]).size()/(4)*3); i < 
-                ((ArrayList<Integer>)t[1]).size(); i++) {
-            sb.append(" ");
+        sb.append("Table: ").append(primarykey);
+        while (sb.length() < horizontalspaces) {
+            sb.append(" ");            
         }
-
+        
         return sb.toString();
     }    
     
