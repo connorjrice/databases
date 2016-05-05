@@ -84,7 +84,7 @@ public class DBMS<E> {
             }
             Table t = new Table(attributes, key);
             tables.add(t);
-            io.write(t.toString(), "-1", key);
+            io.write(t.toString(), "TABLE", key);
         } else {
             Logger.getLogger(Record.class.getName()).log(Level.SEVERE, "Table "
                     + "creation error: inequal number of values and types.");

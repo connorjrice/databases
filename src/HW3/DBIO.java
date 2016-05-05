@@ -54,25 +54,24 @@ public class DBIO<E> {
     }
     
         public DBIO() {
-        //delete();
-        this.index = new HashMap<>();
-        this.db = "test.db";
-        this.ind = "index.db";
-        this.rafs = new HashMap<>();
-        this.positions = new HashMap<>();
-
-        try {
-            rafs.put(db, new RandomAccessFile(db, "rw"));
-            positions.put(db, rafs.get(db).length());
-            rafs.put(ind, new RandomAccessFile(ind, "rw"));
-            positions.put(ind, rafs.get(ind).length());
-            buildIndices();
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
+            this.index = new HashMap<>();
+            this.db = "test.db";
+            this.ind = "index.db";
+            this.rafs = new HashMap<>();
+            this.positions = new HashMap<>();
+            
+            try {
+                rafs.put(db, new RandomAccessFile(db, "rw"));
+                positions.put(db, rafs.get(db).length());
+                rafs.put(ind, new RandomAccessFile(ind, "rw"));
+                positions.put(ind, rafs.get(ind).length());
+                buildIndices();
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
-    }
     
     
     private void buildIndices() {
@@ -171,15 +170,7 @@ public class DBIO<E> {
         positions.put(ind, positions.get(ind) + indOffset);
     }
             
-    
-    public void delete() {
-        try {
-            Files.delete(Paths.get("test.db"));
-            Files.delete(Paths.get("index.db"));
-        } catch (IOException ex) {
-            Logger.getLogger(Record.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }    
+ 
     
     
     
@@ -260,6 +251,7 @@ public class DBIO<E> {
         String sep = " " + DBMS.SEP;
         sep = sep.substring(1);
         String[] pair = s.split(sep);
+        // pair[0] = hash, pair[1] = byte index
         System.out.println(Arrays.toString(pair));
     }
     

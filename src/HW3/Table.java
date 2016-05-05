@@ -1,6 +1,7 @@
 package HW3;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -33,7 +34,7 @@ public class Table<E> {
         s.append(key);        
         s.append(DBMS.TKEY_END);
         s.append(DBMS.PRIME_BEG);
-        s.append(-1);
+        s.append("TABLE");
         s.append(DBMS.PRIME_END);
         s.append(DBMS.TAB_BEG);
         for (Entry<E, Class<E>> e : attributes.entrySet()) {
