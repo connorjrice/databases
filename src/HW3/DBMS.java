@@ -64,19 +64,19 @@ public class DBMS<E> {
  
     public static final char BAD_BAD_BAD = 'Ǒ';
     public static final char SNEAKY_KEY = 14; */// Stuck into hashmaps for tables
-    public static final char TKEY_BEG = 0; // Table key
-    public static final char TKEY_END = 1;
-    public static final char TAB_BEG = 2;  
-    public static final char TAB_END = 3;
-    public static final char REL_BEG = 4;
-    public static final char REL_END = 5;
-    public static final char SEP = 6;
-    public static final char IND_BEG = 7;
-    public static final char IND_END = 8;
-    public static final char RELT_BEG =9 ; // Relation table key beg
-    public static final char RELT_END = 10;
-    public static final char PRIME_BEG = 11;
-    public static final char PRIME_END = 12;
+    public static final char TKEY_BEG = 'A'; // Table key
+    public static final char TKEY_END = 'B';
+    public static final char TAB_BEG = 'C';  
+    public static final char TAB_END = 'D';
+    public static final char REL_BEG = 'E';
+    public static final char REL_END = 'F';
+    public static final char SEP = 16;
+    public static final char IND_BEG = 17;
+    public static final char IND_END = 18;
+    public static final char RELT_BEG =19 ; // Relation table key beg
+    public static final char RELT_END = 20;
+    public static final char PRIME_BEG = 21;
+    public static final char PRIME_END = 22;
  
     public static final char BAD_BAD_BAD = 'Ǒ';
     public static final char SNEAKY_KEY = 14; 

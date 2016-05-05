@@ -203,7 +203,9 @@ public class Data<E>  {
 
 //       int hexToInt = Integer.parseInt(b, 16);
 
-         return b.getBytes();
+       return DatatypeConverter.parseHexBinary(b);
+
+         //return b.getBytes();
        //return DatatypeConverter.parseHexBinary(b);
 
         

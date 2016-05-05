@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -92,12 +93,18 @@ public class DBIO<E> extends Data {
             if (file.length() > 0) {
                 System.out.println("here");
                 StringBuilder sb = new StringBuilder();
-                file.seek(0);
-                String line = file.readUTF();
-
-                sb.append(fromHex(line));
+                byte[] bytes = fromHex(file.readLine());
+                String s = new String(bytes);
                 
-                int type = parse(sb.toString());
+               /* final char[] chars = Character.toChars(0x1F701);
+                
+                final String s = new String(chars);*/
+          
+
+
+                
+
+                int type = parse(null);
                 decide(sb.toString(), type);
             } else {
                 Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE,
