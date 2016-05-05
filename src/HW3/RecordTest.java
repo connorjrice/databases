@@ -8,12 +8,12 @@ public class RecordTest {
     
     public static void main(String[] args) {
         DBMS d = new DBMS("test.db", "index.db");
-        //write(d);
+        write(d);
         read(d);
     }
     
     public static <E extends Comparable> void write(DBMS d) {        
-        d.delete();
+        //d.delete();
         String[] values = {"name","sex","age"};
         Class<?>[] types = {String.class, String.class, String.class};
         d.createTable(values, types, "info");

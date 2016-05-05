@@ -33,12 +33,7 @@ public class DBMS<E> {
         this.index = index;
         this.io = new DBIO(db, index);   
     }
-    
-    public void delete() {
-        io.delete();
-    }
-    
-     /**
+    /**
      * Create a new table.
      * @param attributes
      * @param key: key to find table
@@ -51,11 +46,15 @@ public class DBMS<E> {
                 attributes.put(values[i], types[i]);
             }
             Table t = new Table(attributes, key);
-            io.write(t.toString(), db);
+            io.write(t.toString(), "Attributes: " + t.getKey());
         } else {
             Logger.getLogger(Record.class.getName()).log(Level.SEVERE, "Table "
                     + "creation error: inequal number of values and types.");
         }
+    }
+    
+    public void getTable(String key) {
+        
     }
     
     public int getHash(String key, String record) {
@@ -66,15 +65,23 @@ public class DBMS<E> {
             E[] members, int primaryindex) {
         // TODO: Check to see if members matches schema
         Record r = new Record(members, tablekey, primaryindex);
-        io.write(r.toString(), db);
+        io.write(r.toString(), members[primaryindex].toString());
     }
     
     public <E extends Comparable<? super E>> void findRecord(String key, E member) {
         io.hashLookup(key, member);
     }
     
+    public <E extends Comparable<? super E>> void modifyRecord() {
+        
+    }
+    
+    public <E extends Comparable<? super E>> void deleteRecord() {
+        
+    }
+    
     public void readDB() {
-        io.readDB();
+        io.readIndices();
     }
     
 }

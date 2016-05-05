@@ -26,54 +26,62 @@ import java.util.logging.Logger;
 public class DBIO<E> {
     private String tempKey = "";
     private static final Set<Byte> VALUES = new HashSet<>(Arrays.asList(DBMS.IND_END, DBMS.REL_END, DBMS.TAB_END, DBMS.TKEY_END));
-    private RandomAccessFile dbfile, indfile; 
+    private final String db, ind;
 
     private final HashMap<Integer, Long> index;
-    private final HashMap<String, Integer> tableIndices; // Key, Index in indices
-    private final ArrayList<Table> tables;
     private final HashMap<String, RandomAccessFile> rafs;
-    private final HashMap<RandomAccessFile, Long> positions;
+    private final HashMap<String, Long> positions;
     
     public DBIO(String db, String ind)     {
+        delete();
         this.index = new HashMap<>();
-        
-        this.tableIndices = new HashMap<>();
+        this.db = db;
+        this.ind = ind;
         this.rafs = new HashMap<>();
         this.positions = new HashMap<>();
-        tables = new ArrayList<>();
+
         try {
-            this.dbfile = new RandomAccessFile(db, "rw");
-            this.indfile = new RandomAccessFile(ind, "rw");
+            rafs.put(db, new RandomAccessFile(db, "rw"));
+            positions.put(db, rafs.get(db).length());
+            rafs.put(ind, new RandomAccessFile(ind, "rw"));
+            positions.put(ind, rafs.get(ind).length());
         } catch (FileNotFoundException ex) {
             Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-    }
-    
-    public void write(String input, String file) {
-        try {
-            RandomAccessFile raf = rafs.get(file);
-            long startpos = positions.get(raf);
-            raf.seek(startpos);
-            raf.writeUTF(input);
-            updatePos(raf, getBytes(input));
-
         } catch (IOException ex) {
             Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+        
     }
     
-    private int getBytes(String input) {
+    public void write(String input, String primary) {
+        try {
+            RandomAccessFile dbfile = rafs.get(db);
+            long startpos = positions.get(db);
+            dbfile.seek(startpos);
+            dbfile.writeUTF(input);
+            
+            
+            updatePos(getDBBytes(input), getIndBytes(input));
+        } catch (IOException ex) {
+            Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private int getDBBytes(String input) {
         return input.toCharArray().length;
     }
     
-    private void updatePos(RandomAccessFile raf, long offset) {
-        positions.put(raf, positions.get(raf) + offset);
+    private int getIndBytes(String input) {
+        return 0;
+    }
+    
+    private void updatePos(long dbOffset, long indOffset) {
+        positions.put(db, positions.get(db) + dbOffset);
+        positions.put(ind, positions.get(ind) + indOffset);
     }
             
     
-    public void delete() {
+    private void delete() {
         try {
             Files.delete(Paths.get("test.db"));
         } catch (IOException ex) {
@@ -81,9 +89,8 @@ public class DBIO<E> {
         }
     }    
     
-    public void readDB() {
-
-        try {
+    public void readIndices() {
+       /* try {
             dbfile.seek(0);
        
             StringBuilder sb = new StringBuilder();
@@ -103,8 +110,17 @@ public class DBIO<E> {
             Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, null, ex);
+        }*/
+       try {
+           RandomAccessFile raf = rafs.get(ind);
+           raf.seek(0);
+           
+       } catch (IOException ex) {
+            Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    
     
     public void hashLookup(String key, E member) {
         System.out.println(index.get(getHash(key, member)));
