@@ -31,6 +31,9 @@ public class DBIO<E> {
     private final HashMap<Integer, Long> index;
     private final HashMap<String, RandomAccessFile> rafs;
     private final HashMap<String, Long> positions;
+    
+    private static final String TABLE_INNER = "(ΒΜ)|(ΝΓ)|(Η)";
+    
     private static char[] hexArray = "0123456789ABCDEF".toCharArray();     
     
     public DBIO(String db, String ind) {
@@ -59,6 +62,14 @@ public class DBIO<E> {
                 }
             }            
             initialize();
+    }
+    
+    private static String getString(char[] _c) {
+        StringBuilder sb = new StringBuilder();
+        for (char c : _c) {
+            sb.append(c).append("|");
+        }
+        return sb.toString();
     }
         
     private void initialize() {
@@ -204,16 +215,9 @@ public class DBIO<E> {
         positions.put(db, positions.get(db) + dbOffset);
         positions.put(ind, positions.get(ind) + indOffset);
     }
-            
-    
-    
     
     public void hashLookup(E primary, String tablekey) {
         System.out.println(index.get(getHash(primary, tablekey)));
-    }
-    
-    private int getHash(String key, E member) {
-        return (key + member.toString()).hashCode();
     }
     
     private int parse(String s) {
@@ -243,8 +247,10 @@ public class DBIO<E> {
     
     private void readTable(String s) {
         s = s.substring(1, s.length()-1);
-        String[] pairs = s.split(",");
-        HashMap<E, Class<E>> attributes = new HashMap();
+        System.out.println(s);
+        String[] pairs = s.split(TABLE_INNER);
+        System.out.println(Arrays.toString(pairs));
+//        HashMap<E, Class<E>> attributes = new HashMap();
         /*for (String d : pairs) {
             String[] pair = d.split("6");
             pair[1] = pair[1].trim();
