@@ -42,6 +42,7 @@ public class Table<E> {
             String class_ = e.getValue().toString().split(" ")[1];
             s.append(class_).append(',').append(' ');
         }
+        s = new StringBuilder().append(s.substring(0, s.length()-2));
         
         s.append(DBMS.TAB_END).append('\n');
         
