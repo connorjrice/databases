@@ -18,6 +18,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.bind.DatatypeConverter;
 
 /**
  *
@@ -31,9 +32,10 @@ public class DBIO<E> {
     private final HashMap<Integer, Long> index;
     private final HashMap<String, RandomAccessFile> rafs;
     private final HashMap<String, Long> positions;
+    private static char[] hexArray = "0123456789ABCDEF".toCharArray();     
     
-    public DBIO(String db, String ind)     {
-        delete();
+    public DBIO(String db, String ind) {
+        //delete();
         this.index = new HashMap<>();
         this.db = db;
         this.ind = ind;
@@ -45,9 +47,32 @@ public class DBIO<E> {
             positions.put(db, rafs.get(db).length());
             rafs.put(ind, new RandomAccessFile(ind, "rw"));
             positions.put(ind, rafs.get(ind).length());
+            buildIndices();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
+            Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void buildIndices() {
+        try {
+            RandomAccessFile indfile = rafs.get(ind);
+            if (indfile.length()> 0) {
+                StringBuilder sb = new StringBuilder();
+                char c;
+                while (indfile.getFilePointer() < indfile.length()) {
+                    while ((c=indfile.readChar()) != '\n') {
+                        sb.append(c);
+                    }
+                    System.out.println(sb.toString());
+                }
+            } else {
+                Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, "Index file was empty!");
+            }
+            
+           
+       } catch (IOException ex) {
             Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -63,22 +88,62 @@ public class DBIO<E> {
             RandomAccessFile dbfile = rafs.get(db);
             long startpos = positions.get(db);
             dbfile.seek(startpos);
-            dbfile.writeUTF(input);
+            //String s = bytesToHex(input.getBytes());
+            dbfile.writeChars(input);
             index.put(getHash(primary, tablekey), startpos);
             
             RandomAccessFile indfile = rafs.get(ind);
             indfile.seek(indfile.length());
-            indfile.writeUTF(getIndUTF(primary, tablekey));
-            
+            String inds = getIndUTF(primary,tablekey);
+            indfile.writeChars(inds);
             updatePos(getDBBytes(input), getIndBytes(input));
         } catch (IOException ex) {
             Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
+    public void writeDB(ArrayList<Table> tables) {
+        try (RandomAccessFile raf = new RandomAccessFile("test.db", "rw")) {
+            for (Table t : tables) {
+                String s = bytesToHex(t.toString().getBytes());
+                raf.writeUTF(s);
+            }
+            raf.close();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public static String toHexString(byte[] bytes) {
+        return DatatypeConverter.printHexBinary(bytes);
+        
+    }
+    
+    /**
+     * I got this from StackOverflow
+     * @param bytes
+     * @return 
+     */
+    public static String bytesToHex(byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 2];
+        for ( int j = 0; j < bytes.length; j++ ) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+        }
+        return new String(hexChars);
+}        
+    
     private String getIndUTF(String primary, String tablekey) {
-        return DBMS.IND_BEG + getHash(primary, tablekey) + DBMS.SEP +
-                index.get(getHash(primary, tablekey)).toString() + DBMS.IND_END;
+        StringBuilder sb = new StringBuilder();
+        sb.append(DBMS.IND_BEG);
+        sb.append(getHash(primary, tablekey));
+        sb.append(DBMS.SEP);
+        sb.append(index.get(getHash(primary, tablekey)).toString());
+        sb.append(DBMS.IND_END).append('\n');
+        return sb.toString();
     }
     
     private int getHash(String primary, String tablekey) {
@@ -99,7 +164,7 @@ public class DBIO<E> {
     }
             
     
-    private void delete() {
+    public void delete() {
         try {
             Files.delete(Paths.get("test.db"));
             Files.delete(Paths.get("index.db"));
@@ -130,13 +195,7 @@ public class DBIO<E> {
         } catch (IOException ex) {
             Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, null, ex);
         }*/
-       try {
-           RandomAccessFile raf = rafs.get(ind);
-           raf.seek(0);
-           
-       } catch (IOException ex) {
-            Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
-        }
+
     }
     
     

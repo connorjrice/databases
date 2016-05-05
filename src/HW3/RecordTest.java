@@ -8,7 +8,7 @@ public class RecordTest {
     
     public static void main(String[] args) {
         DBMS d = new DBMS("test.db", "index.db");
-        write(d);
+        //write(d);
         read(d);
     }
     
@@ -24,7 +24,7 @@ public class RecordTest {
     }
     
     public static void read(DBMS d) {
-
+        
         d.readDB();
         //d.findRecord("info", "connor");
     }

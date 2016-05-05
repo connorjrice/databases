@@ -52,7 +52,7 @@ public class Record<E> {
             }
 
         }
-        sb.append(DBMS.REL_END);
+        sb.append(DBMS.REL_END).append('\n');
         return sb.toString();
     }
 

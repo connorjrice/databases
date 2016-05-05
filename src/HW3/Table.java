@@ -39,10 +39,10 @@ public class Table<E> {
         for (Entry<E, Class<E>> e : attributes.entrySet()) {
             s.append(e.getKey().toString()).append(DBMS.SEP);
             String class_ = e.getValue().toString().split(" ")[1];
-            s.append(class_).append(", ");
+            s.append(class_).append(',').append(' ');
         }
         
-        s.append(DBMS.TAB_END);
+        s.append(DBMS.TAB_END).append('\n');
         
         return s.toString();
     }

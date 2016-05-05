@@ -34,7 +34,7 @@ public class DBMS<E> {
     public DBMS(String db, String index) {
         this.db = db;
         this.index = index;
-        this.io = new DBIO(db, index);   
+        this.io = new DBIO(db, index);
     }
     /**
      * Create a new table.
@@ -81,6 +81,10 @@ public class DBMS<E> {
     
     public <E extends Comparable<? super E>> void deleteRecord() {
         
+    }
+    
+    public void delete() {
+        io.delete();
     }
     
     public void readDB() {
