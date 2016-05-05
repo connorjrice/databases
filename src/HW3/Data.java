@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
+import javax.xml.bind.DatatypeConverter;
 
 /**
  * Parent class for Record and Table.
@@ -11,6 +12,7 @@ import java.util.Set;
  */
 public class Data<E>  {
     private static final String NODICE = "--*i got nothin'*--";
+    private static char[] hexArray = "0123456789ABCDEF".toCharArray();    
     
     public Data() {
 
@@ -168,5 +170,25 @@ public class Data<E>  {
 	sb.append("*");
         return sb.toString();
     }    
+    
+    public static String toHexString(byte[] bytes) {
+        return DatatypeConverter.printHexBinary(bytes);
+        
+    }
+    
+    /**
+     * I got this from StackOverflow
+     * @param bytes
+     * @return 
+     */
+    public static String bytesToHex(byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 2];
+        for ( int j = 0; j < bytes.length; j++ ) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+        }
+        return new String(hexChars);
+}            
     
 }
