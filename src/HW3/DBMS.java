@@ -13,19 +13,19 @@ import java.util.logging.Logger;
  */
 public class DBMS<E> {
     // These are all used for enclosing data
-    public static final byte TKEY_BEG = 0; // Table key
-    public static final byte TKEY_END = 1;
-    public static final byte TAB_BEG = 2;  
-    public static final byte TAB_END = 3;
-    public static final byte REL_BEG = 4;
-    public static final byte REL_END = 5;
-    public static final byte SEP = 6;
-    public static final byte IND_BEG = 7;
-    public static final byte IND_END = 8;
-    public static final byte RELT_BEG = 9; // Relation table key beg
-    public static final byte RELT_END = 10;
-    public static final byte PRIME_BEG = 11;
-    public static final byte PRIME_END = 12;
+    public static final char TKEY_BEG = 'Α'; // Table key
+    public static final char TKEY_END = 'Β';
+    public static final char TAB_BEG = 'Γ';  
+    public static final char TAB_END = 'Δ';
+    public static final char REL_BEG = 'Ε';
+    public static final char REL_END = 'Ζ';
+    public static final char SEP = 'Η';
+    public static final char IND_BEG = 'Θ';
+    public static final char IND_END = 'Ι';
+    public static final char RELT_BEG = 'Κ'; // Relation table key beg
+    public static final char RELT_END = 'Λ';
+    public static final char PRIME_BEG = 'Μ';
+    public static final char PRIME_END = 'Ν';
     
 
     private final DBIO io;
@@ -39,6 +39,14 @@ public class DBMS<E> {
         this.index = index;
         this.io = new DBIO(db, index);
         this.tables = new ArrayList<>();
+    }
+    
+    public DBMS() {
+        this.db = "test.db";
+        this.index = "index.db";
+        this.io = new DBIO(db, index);
+        this.tables = new ArrayList<>();
+
     }
     
     

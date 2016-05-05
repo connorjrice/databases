@@ -24,7 +24,7 @@ import javax.xml.bind.DatatypeConverter;
  */
 public class DBIO<E> {
     private String tempKey = "";
-    private static final Set<Byte> VALUES = new HashSet<>(Arrays.asList(DBMS.IND_END, DBMS.REL_END, DBMS.TAB_END, DBMS.TKEY_END));
+    private static final Set<Character> VALUES = new HashSet<>(Arrays.asList(DBMS.IND_END, DBMS.REL_END, DBMS.TAB_END, DBMS.TKEY_END));
     private final String db, ind;
 
     private final HashMap<Integer, Long> index;
@@ -45,13 +45,35 @@ public class DBIO<E> {
             positions.put(db, rafs.get(db).length());
             rafs.put(ind, new RandomAccessFile(ind, "rw"));
             positions.put(ind, rafs.get(ind).length());
-            //buildIndices();
+            buildIndices();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+        public DBIO() {
+        //delete();
+        this.index = new HashMap<>();
+        this.db = "test.db";
+        this.ind = "index.db";
+        this.rafs = new HashMap<>();
+        this.positions = new HashMap<>();
+
+        try {
+            rafs.put(db, new RandomAccessFile(db, "rw"));
+            positions.put(db, rafs.get(db).length());
+            rafs.put(ind, new RandomAccessFile(ind, "rw"));
+            positions.put(ind, rafs.get(ind).length());
+            buildIndices();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     
     private void buildIndices() {
         try {
@@ -61,9 +83,10 @@ public class DBIO<E> {
                 char c;
                 while (indfile.getFilePointer() < indfile.length()) {
                     while ((c=indfile.readChar()) != '\n') {
-                        sb.append(c);
+                        sb.append(c).append(" ");
                     }
                     System.out.println(sb.toString());
+                    System.out.println(Arrays.toString(sb.toString().getBytes()));
                 }
             } else {
                 Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, "Index file was empty!");
@@ -75,6 +98,7 @@ public class DBIO<E> {
         }
     }
     
+    
     /**
      * 
      * @param input the data to be written
@@ -84,17 +108,22 @@ public class DBIO<E> {
     public void write(String input, String primary, String tablekey) {
         try {
             RandomAccessFile dbfile = rafs.get(db);
-            long startpos = positions.get(db);
-            dbfile.seek(startpos);
+            long dbstart = positions.get(db);
+            dbfile.seek(dbstart);
             //String s = bytesToHex(input.getBytes());
             dbfile.writeChars(input);
-            index.put(getHash(primary, tablekey), startpos);
+            index.put(getHash(primary, tablekey), dbstart);
+            long dbdiff = dbfile.getFilePointer() - dbstart;
+            
             
             RandomAccessFile indfile = rafs.get(ind);
-            indfile.seek(indfile.length());
+            long indstart = positions.get(ind);
+            indfile.seek(indstart);
             String inds = getIndUTF(primary,tablekey);
             indfile.writeChars(inds);
-            updatePos(getDBBytes(input), getIndBytes(input));
+            long inddiff = indfile.getFilePointer() - indstart;
+            
+            updatePos(dbdiff, inddiff);
         } catch (IOException ex) {
             Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -135,13 +164,6 @@ public class DBIO<E> {
         return (primary + tablekey).hashCode();
     }
     
-    private int getDBBytes(String input) {
-        return input.toCharArray().length;
-    }
-    
-    private int getIndBytes(String input) {
-        return 0;
-    }
     
     private void updatePos(long dbOffset, long indOffset) {
         positions.put(db, positions.get(db) + dbOffset);
@@ -157,31 +179,6 @@ public class DBIO<E> {
             Logger.getLogger(Record.class.getName()).log(Level.SEVERE, null, ex);
         }
     }    
-    
-    public void readIndices() {
-       /* try {
-            dbfile.seek(0);
-       
-            StringBuilder sb = new StringBuilder();
-            char c;
-            while (dbfile.getFilePointer() < dbfile.length()) {
-                byte[] bytes = dbfile.readLine().getBytes();
-                int i = 0;
-                while (!VALUES.contains(bytes[i]) && i < bytes.length-1){
-                    sb.append(bytes[i]);
-                    i++;
-                }
-                decide(sb.toString().trim(), parse(sb.toString().trim()));
-                sb = new StringBuilder();
-            }
-            dbfile.close();
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, null, ex);
-        }*/
-
-    }
     
     
     
