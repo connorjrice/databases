@@ -90,6 +90,12 @@ public class DBMS<E> {
         io.write(r.toString(), r.getPrimary(), tablekey, db);
     }    
     
+    /**
+     * Flow: findRecord() -> io.hashLookup() -> 
+     * @param <E>
+     * @param primarykey
+     * @param tablekey 
+     */
     public <E extends Comparable<? super E>> void findRecord(E primarykey, String tablekey) {
         Record r = io.hashLookup(primarykey, tablekey);
         HashMap<E, Class<E>> attributes = io.getAttributes(r.getTableKey());
@@ -107,8 +113,6 @@ public class DBMS<E> {
             insertRecord(tablekey, members, r.getPrimaryIndex(), false);
         }
     }
-    
-
     
     public <E extends Comparable<? super E>> String deleteRecord(E primarykey, String tablekey) {
         return io.deleteRecord(primarykey, tablekey);

@@ -60,7 +60,7 @@ public class Table<E extends Comparable<Table>> extends Data {
         
         s.append(DBMS.TAB_END).append('\n');
         
-        return s.toString();
+        return toHexString(s.toString().getBytes());
     }
     
     

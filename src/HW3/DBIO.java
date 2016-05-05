@@ -14,10 +14,10 @@ import java.util.logging.Logger;
 import javax.xml.bind.DatatypeConverter;
 
 /**
- *
+ * Maybe extend data too?
  * @author Connor
  */
-public class DBIO<E> {
+public class DBIO<E> extends Data {
     private final String db, ind;
 
     // Integer = Hash, String = Long[].toString()
@@ -64,7 +64,6 @@ public class DBIO<E> {
         
     private void initialize() {
         try {
-
             rafs.put(db, new RandomAccessFile(db, "rw"));
             curPositions.put(db, rafs.get(db).length());
             rafs.put(ind, new RandomAccessFile(ind, "rw"));
@@ -89,24 +88,83 @@ public class DBIO<E> {
         try {
             RandomAccessFile file = rafs.get(path);
             if (file.length() > 0) {
+                System.out.println("here");
                 StringBuilder sb = new StringBuilder();
-                char c;
-                while (file.getFilePointer() < file.length()) {
-                    while ((c=file.readChar()) != '\n') {
-                        sb.append(c);
-                    }
-                    int type = parse(sb.toString());
-                    decide(sb.toString(), type);
-                    sb = new StringBuilder();
-                }
+
+                
+                sb.append(file.readLine());
+                String[] split = splitStringEvery(sb.toString(), 2);
+                System.out.println(Arrays.toString(split));
+                int type = parse(sb.toString());
+                decide(sb.toString(), type);
             } else {
                 Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE,
                         "{0} was empty!", path);
-            }
+            }            
+            System.out.println(Arrays.toString(tables.values().toArray()));
        } catch (IOException ex) {
             Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
+    
+    /*
+     * Return a record from the db file.
+     * @param primary
+     * @param tablekey
+     * @return 
+     */
+    public Record hashLookup(E primary, String tablekey) {
+        return getRecordFromHash(parseIndexString(getHash(primary,tablekey)));
+    }    
+    
+    /**
+     * De-hex, lookup, return.
+     * @param bounds[0] = startPos, bounds[1] = endPos
+     * @return 
+     */
+    private Record getRecordFromHash(Long[] bounds) {
+        Record r = null;
+        try {
+            RandomAccessFile file = rafs.get(db);
+            file.seek(bounds[0]);
+            byte[] hexbytes = new byte[Math.toIntExact(bounds[1]-bounds[0])];            
+            int i = 0;
+            while (file.getFilePointer() < bounds[1]) {
+                hexbytes[i] = file.readByte();
+            }
+            String s = Integer.toHexString(i);
+            System.out.println(s);
+            
+            // Trim special chars and split
+            //String s = sb.toString().substring(1,sb.length()-1);
+            String[] split = s.split(RELATION_SPLIT);
+            int primaryindex = -1;
+            boolean found = false;
+            for (int j = 2; j < split.length; j++) {
+                if (split[1].compareTo(split[j]) == 0 & !found) {
+                    primaryindex = j-2;
+                    found = true;
+                }
+            }
+            r = new Record(Arrays.copyOfRange(split, 2, 5), split[0],
+                    primaryindex);
+        } catch (IOException ex) {
+            Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ArithmeticException ae) {
+            Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, 
+                    "HOLY COW THAT WAS A BIG ENTRY!", ae);            
+
+        }
+       
+        return r;        
+    }
+    
+    private Long[] parseIndexString(int hashCode) {
+        String[] split = index.get(hashCode).split(",");
+        return new Long[]{Long.parseLong(split[0]),Long.parseLong(split[1])};
+    }        
+        
 
     
     /**
@@ -120,7 +178,6 @@ public class DBIO<E> {
             RandomAccessFile dbfile = rafs.get(db);
             long dbstart = curPositions.get(db);
             dbfile.seek(dbstart);
-            //String s = bytesToHex(input.getBytes());
             dbfile.writeChars(input);
             long dbdiff = dbfile.getFilePointer() - dbstart;
             index.put(getHash(primary, tablekey), (Long.toString(dbstart) + "," +
@@ -157,7 +214,7 @@ public class DBIO<E> {
         sb.append(DBMS.SEP);
         sb.append(index.get(getHash(primary, tablekey)));
         sb.append(DBMS.IND_END).append('\n');
-        return sb.toString();
+        return toHexString(sb.toString().getBytes());
     }
     
     /**
@@ -173,15 +230,7 @@ public class DBIO<E> {
     private int getHash(Table t) {
         return (t.getTableKey().hashCode());
     }
-    /*
-     * Return a record from the db file.
-     * @param primary
-     * @param tablekey
-     * @return 
-     */
-    public Record hashLookup(E primary, String tablekey) {
-        return parseRelation(parseIndexString(getHash(primary,tablekey)));
-    }
+
     
     protected String deleteRecord(E primary, String tablekey) {
         Long[] bounds = parseIndexString(getHash(primary, tablekey));
@@ -200,48 +249,13 @@ public class DBIO<E> {
 
     }
     
-    private Long[] parseIndexString(int hashCode) {
-        String[] split = index.get(hashCode).split(",");
-        return new Long[]{Long.parseLong(split[0]),Long.parseLong(split[1])};
-    }        
-    
+
     private void updatePos(long dbOffset, long indOffset) {
         curPositions.put(db, curPositions.get(db) + dbOffset);
         curPositions.put(ind, curPositions.get(ind) + indOffset);
     }
     
 
-    private Record parseRelation(Long[] bounds) {
-        Record r = null;
-        try {
-            RandomAccessFile file = rafs.get(db);
-            file.seek(bounds[0]);
-            StringBuilder sb = new StringBuilder();            
-            char c;            
-            while (file.getFilePointer() < bounds[1]) {
-                while ((c=file.readChar()) != '\n') {
-                    sb.append(c);                
-                }
-            }
-            // Trim special chars and split
-            String s = sb.toString().substring(1,sb.length()-1);
-            String[] split = s.split(RELATION_SPLIT);
-            int primaryindex = -1;
-            boolean found = false;
-            for (int i = 2; i < split.length; i++) {
-                if (split[1].compareTo(split[i]) == 0 & !found) {
-                    primaryindex = i-2;
-                    found = true;
-                }
-            }
-            r = new Record(Arrays.copyOfRange(split, 2, 5), split[0],primaryindex);
-        } catch (IOException ex) {
-            Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
-        }
-       
-        return r;
-    }
-    
     private int parse(String s) {
         if (s.charAt(0) == DBMS.TKEY_BEG && s.indexOf(DBMS.TAB_END) > 0) {
             return 0; // Table
@@ -300,6 +314,7 @@ public class DBIO<E> {
 
     
     private void readIndex(String s) {
+        System.out.println(s);
         s = s.substring(1, s.length()-1); // trim special chars     
         String[] pair = s.split(INDEX_SPLIT);
         index.put(Integer.parseInt(pair[0]), pair[1]);
