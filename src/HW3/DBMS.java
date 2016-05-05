@@ -52,13 +52,13 @@ public class DBMS<E> {
      * @param key: key to find table
      */
     public <E extends Comparable<? super E>> void createTable(E[] values, 
-            Class<E>[] types, String key) {
+            Class<E>[] types, String key, int primaryindex) {
         if (values.length == types.length) {
             HashMap<E, Class<E>> attributes = new HashMap();
             for (int i = 0; i < values.length; i++) {
                 attributes.put(values[i], types[i]);
             }
-            Table t = new Table(attributes, key);
+            Table t = new Table(attributes, key, values[primaryindex].toString());
             io.addTable(t);
             io.write(t.toString(), TABLE, key);
         } else {
@@ -88,9 +88,9 @@ public class DBMS<E> {
     public <E extends Comparable<? super E>> void findRecord(E primarykey, String tablekey) {
         
         Record r = io.hashLookup(primarykey, tablekey);
-                r.toStringPretty(
-                        io.getAttributes(
-                                io.getHash(TABLE, tablekey)));
+        System.out.println(r.toString());
+        HashMap<E, Class<E>> attributes = io.getAttributes(r.getTableKey());
+        r.toStringPretty(attributes);
     }
     
     public <E extends Comparable<? super E>> void modifyRecord() {

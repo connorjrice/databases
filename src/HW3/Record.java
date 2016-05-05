@@ -34,7 +34,12 @@ public class Record<E> {
     public String getPrimary() {
         return members[primary].toString();
     }
-
+    
+    public String getTableKey() {
+        return tablekey;
+        
+    }
+    
     public String toStringPretty(HashMap<E, Class<E>> attributes) {
         return "";
     }

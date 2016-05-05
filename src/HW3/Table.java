@@ -1,7 +1,5 @@
 package HW3;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -12,16 +10,17 @@ import java.util.Map.Entry;
 public class Table<E> {
     
     private final HashMap<E, Class<E>> attributes;
-    private final String key;
-    private static final String PRIMARY = "TABLE";
+    private final String tablekey;
+    private final String primary;
     
-    public Table(HashMap<E, Class<E>> attributes, String key) {
+    public Table(HashMap<E, Class<E>> attributes, String tablekey, String primary) {
         this.attributes = attributes;
-        this.key = key;
+        this.tablekey = tablekey;
+        this.primary = primary;
     }
     
-    public String getKey() {
-        return key;
+    public String getTableKey() {
+        return tablekey;
     }    
     
     public HashMap<E, Class<E>> getAttributes() {
@@ -29,12 +28,12 @@ public class Table<E> {
     }
     
     public String getPrimary() {
-        return PRIMARY;
+        return primary;
     }
     
     public String toStringPretty() {
         StringBuilder s = new StringBuilder();
-        s.append("Table name: ").append(key);
+        s.append("Table name: ").append(tablekey);
         return s.toString();
     }
     
@@ -42,10 +41,10 @@ public class Table<E> {
     public String toString() {
         StringBuilder s = new StringBuilder();
         s.append(DBMS.TKEY_BEG);
-        s.append(key);        
+        s.append(tablekey);        
         s.append(DBMS.TKEY_END);
         s.append(DBMS.PRIME_BEG);
-        s.append(PRIMARY);
+        s.append(primary);
         s.append(DBMS.PRIME_END);
         s.append(DBMS.TAB_BEG);
         for (Entry<E, Class<E>> e : attributes.entrySet()) {

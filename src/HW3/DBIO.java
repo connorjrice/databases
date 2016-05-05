@@ -108,10 +108,7 @@ public class DBIO<E> {
             Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    public HashMap<E, Class<E>> getAttributes(int hashCode) {
-        return tables.get(hashCode).getAttributes();
-    }
+
     
     private Long[] parseIndexString(int hashCode) {
         String[] split = index.get(hashCode).split(",");
@@ -150,7 +147,7 @@ public class DBIO<E> {
     }
     
     public void addTable(Table t) {
-        tables.put(getHash((E) t.getPrimary(), t.getKey()), t);
+        tables.put(getHash((E) t.getPrimary(), t.getTableKey()), t);
     }
     
     
@@ -194,8 +191,10 @@ public class DBIO<E> {
         return (primary.toString() + tablekey).hashCode();
     }
     
+    
+    
     private int getHash(Table t) {
-        return (t.getPrimary() + t.getKey()).hashCode();
+        return (t.getTableKey().hashCode());
     }
     
     private void updatePos(long dbOffset, long indOffset) {
@@ -271,6 +270,10 @@ public class DBIO<E> {
         }
     }
     
+    public HashMap<E, Class<E>> getAttributes(String tablekey) {
+        return tables.get(tablekey.hashCode()).getAttributes();
+    }    
+    
     private void readTable(String s) {
         s = s.substring(1, s.length()-1);
         String[] pairs = s.split(TABLE_INNER);
@@ -284,7 +287,7 @@ public class DBIO<E> {
                         .log(Level.SEVERE, null, ex);
             }
         }
-        Table t = new Table(attributes, pairs[0]);
+        Table t = new Table(attributes, pairs[0], pairs[1]);
         tables.put(getHash(t), t);
     }
     
@@ -297,6 +300,7 @@ public class DBIO<E> {
         String[] pair = s.split(INDEX_INNER);
         index.put(Integer.parseInt(pair[0]), pair[1]);
     }
+    
     
     public Collection<Table> getTables() {
         return tables.values();
