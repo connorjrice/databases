@@ -187,17 +187,21 @@ public class DBIO<E> {
     }
     
     public void hashLookup(E primary, String tablekey) {
-        System.out.println(index.get(getHash(primary, tablekey)));
+        Record r;
+        int hash = getHash(primary,tablekey);
+        r = parseRelation(parseIndexString(hash));
+        
+        //System.out.println(index.get(getHash(primary, tablekey)));
     }
     
-    private Record parseRelation(long startPos, long endPos) {
+    private Record parseRelation(Long[] bounds) {
         Record r;
         try {
             RandomAccessFile file = rafs.get(db);
-            file.seek(startPos);
+            file.seek(bounds[0]);
             StringBuilder sb = new StringBuilder();            
             char c;            
-            while (file.getFilePointer() < endPos) {
+            while (file.getFilePointer() < bounds[1]) {
                 while ((c=file.readChar()) != '\n') {
                     sb.append(c);                
                 }
@@ -213,7 +217,7 @@ public class DBIO<E> {
     private int parse(String s) {
         if (s.charAt(0) == DBMS.TKEY_BEG && s.indexOf(DBMS.TAB_END) > 0) {
             return 0; // Table
-        } else if (s.charAt(0) == DBMS.REL_BEG && s.indexOf(DBMS.REL_END) > 0) {
+        } else if (s.charAt(0) == DBMS.RELT_BEG && s.indexOf(DBMS.REL_END) > 0) {
             return 1; // relation
         } else if (s.charAt(0) == DBMS.IND_BEG && s.indexOf(DBMS.IND_END) > 0) {
             return 2; // index
