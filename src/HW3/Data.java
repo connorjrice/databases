@@ -174,10 +174,19 @@ public class Data<E>  {
     }    
     
     public static byte[] toHex(String s) {
+        try {
+            if(s.length()%2==1) {
+                s = '\n'+s;
+            }
+            return DatatypeConverter.parseHexBinary(s);            
+        } catch (IllegalArgumentException i) {
+            Logger.getLogger(Data.class.getName()).log(Level.SEVERE,
+                        "Illegal character: ", i);            
+
+        }
         return DatatypeConverter.parseHexBinary(s);
-        
     }
-    
+        
     public static String fromHex(byte[] bytes) {
         return DatatypeConverter.printHexBinary(bytes);
         
