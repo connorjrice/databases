@@ -27,9 +27,10 @@ public class RecordTest {
     public static <E extends Comparable> void write() {        
         DBMS d = new DBMS();
         String[] values = {"name","sex","age"};
-        Class<?>[] types = {String.class, String.class, String.class};
+        Class<?>[] types = {String.class, String.class, Integer.class};
         d.createTable(values, types, "info", 0);
         String[] record = {"connor", "m", "23"};
+        
         d.insertRecord("info", record, 0);
         //d.findRecord("info", "connor");
         //d.writeDB();

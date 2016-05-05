@@ -74,7 +74,7 @@ public class DBMS<E> {
     }
     
     public void getTable(String key) {
-        
+
     }
     
     
@@ -87,7 +87,6 @@ public class DBMS<E> {
     
     public <E extends Comparable<? super E>> void findRecord(E primarykey, String tablekey) {
         Record r = io.hashLookup(primarykey, tablekey);
-//        System.out.println(r.toString());
         HashMap<E, Class<E>> attributes = io.getAttributes(r.getTableKey());
         System.out.println(r.toStringPretty(attributes));
     }

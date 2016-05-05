@@ -1,7 +1,9 @@
 package HW3;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 
@@ -45,34 +47,52 @@ public class Record<E> {
     
     public String toStringPretty(HashMap<E, Class<E>> attributes) {
         StringBuilder picky = new StringBuilder();
+        ArrayList<Integer> positions = new ArrayList<>();
         attributes.values().forEach((Class<E> v) -> {
             picky.append(v.getSimpleName()).append(" ");
+            positions.add(picky.length());
         });
         String types = picky.toString();
         StringBuilder sb = new StringBuilder();
-        attributes.keySet().forEach(sb::append); // it's like java is C++
+        int i = 0;
+        for (String s : (Set<String>) attributes.keySet()) {
+            sb.append(s);            
+            for (int j = sb.length(); j < positions.get(i)-1; j++) {
+                sb.append(" ");
+            }
+            i++;
+        }
         String labels = sb.toString();
         sb = new StringBuilder();
-        System.out.println(Arrays.toString(members));
-        Arrays.stream(members).forEach(sb::append);
-        String record = sb.toString();
-
+        //Arrays.stream(members).forEach(sb::append);
+        i = 0;
+        for (Object o : Arrays.stream(members).toArray()) {
+            sb.append(o.toString());
+            for (int j = sb.length(); j < positions.get(i)-1; j++) {
+                sb.append(" ");
+            }
+            i++;            
+        }
         
-	sb.append("*");
-        for (int i = 0; i < types.length(); i++) {
+        
+
+
+        String record = sb.toString();
+        sb = new StringBuilder();
+        
+	sb.append("*-");
+        for (int j = 0; j < types.length(); j++) {
             sb.append("-");
         }
 
-	sb.append("*\n");
+	sb.append("*");
 	String border = sb.toString();
 	sb = new StringBuilder();
-	sb.append(border);
+	sb.append(border).append("\n");
 	sb.append("| ").append(labels).append(" |\n");
-	sb.append("| ").append(types).append(" |\n");
+	sb.append("| ").append(types).append("|\n");
 	sb.append("| ").append(record).append(" |\n");
 	sb.append(border);
-	
-	
         return sb.toString();
     }
 
