@@ -6,13 +6,15 @@ import java.util.HashMap;
 import java.util.Set;
 
 /**
- *
+ * Parent class for Record and Table.
  * @author Connor
  */
-public class Data<E> {
+public class Data<E>  {
+    
+    private boolean table;
     
     public Data() {
- 
+
     }
     
     /**
@@ -22,26 +24,42 @@ public class Data<E> {
      * @param members
      * @return 
      */
-    public String toStringPretty(HashMap<E, Class<E>> attributes, E[] members) {
+    public <E extends Comparable>
+        String toStringPretty(HashMap<E, Class<E>> attributes, E[] members) {
         StringBuilder sb = new StringBuilder();
         String labels = "";
         String record = "";
         Object[] t = getTypes(attributes);
+        String border = getBorder((String) t[0]);        
         if (!((ArrayList<Integer>) t[1]).isEmpty()) {
             labels = "| " + getLabels(t) + "|\n";
             record = "| " + getRecord(t, members) + "|\n";
+            sb.append(border).append("\n");            
+            sb.append("| ").append((String) t[0]).append("|\n");                    
+            sb.append(labels);            
+            sb.append(record);            
+        } else {
+            
         }
-	String border = getBorder((String) t[0]);
         
-	sb.append(border).append("\n");
-	sb.append("| ").append((String) t[0]).append("|\n");        
-	sb.append(labels);
-	sb.append(record);
+
+
+
+
 	sb.append(border);
         return sb.toString();
     }
     
-    private Object[] getTypes(HashMap<E, Class<E>> attributes) {
+    /**
+     * Returns a... struct? 
+     * t[0] = (String) types
+     * t[1] = (ArrayList<Integer> positions
+     * t[2] = (HashMap<E, Class<E>> attributes
+     * @param attributes
+     * @return 
+     */
+    private <E extends Comparable<? super E>>
+         Object[] getTypes(HashMap<E, Class<E>> attributes) {
         StringBuilder picky = new StringBuilder();
         ArrayList<Integer> positions = new ArrayList<>();
         attributes.values().forEach((Class<E> v) -> {
@@ -55,7 +73,12 @@ public class Data<E> {
         return new Object[]{picky.toString(),positions, attributes};
     }
     
-    private String getLabels(Object[] t) {
+    /**
+     * Returns a string containing the id labels.
+     * @param t
+     * @return 
+     */
+    private <E extends Comparable<? super E>> String getLabels(Object[] t) {
         StringBuilder sb = new StringBuilder();
         int i = 0;
         for (String s : ((Set<String>) ((HashMap<E, Class<E>>) t[2]).keySet())) {
@@ -68,20 +91,32 @@ public class Data<E> {
         return sb.toString();
     }
     
-    private String getRecord(Object[] t, E[] members) {
+    /**
+     * Returns the id of the record queried for.
+     * TODO: Select * From
+     * @param t
+     * @param members
+     * @return 
+     */
+    private <E extends Comparable<? super E>> String getRecord(Object[] t,
+            E[] members) {
         StringBuilder sb = new StringBuilder();        
         int i = 0;
         // Add a class cast exception to check for tom foolery (ArrayList<Integer>t[2]).
         // positions.size() = members.length
-        if (members.length > 0 && ((ArrayList<Integer>) t[1]).size() == members.length) {
-            for (Object o : Arrays.stream(members).toArray()) {
-                sb.append(o.toString());
-                // Spacing
-                for (int j = sb.length(); j < ((ArrayList<Integer>) t[1]).get(i); j++) {
-                    sb.append(" ");
+        if (members != null) {
+            if (members.length > 0 && ((ArrayList<Integer>) t[1]).size() == members.length) {
+                for (Object o : Arrays.stream(members).toArray()) {
+                    sb.append(o.toString());
+                    // Spacing
+                    for (int j = sb.length(); j < ((ArrayList<Integer>) t[1]).get(i); j++) {
+                        sb.append(" ");
+                    }
+                    i++;            
                 }
-                i++;            
             }
+        } else { // if members is null we have a table
+                 // TODO: or an array
         }
         return sb.toString();
     }

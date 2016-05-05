@@ -4,7 +4,7 @@ package HW3;
  * @author Connor
  * @param <E>
  */
-public class Record<E extends Comparable> extends Data<E> {
+public class Record<E extends Comparable<? super E>> extends Data {
     
     private final E[] members;
     private final String tablekey;    
@@ -21,13 +21,7 @@ public class Record<E extends Comparable> extends Data<E> {
         this.tablekey = tablekey;
         this.primary = primary;
    }    
-/*
-    public Record(E[] members, String tablekey, int primary) {
-        this.members = members;
-        this.tablekey = tablekey;
-        this.primary = primary;
-    }*/
-    
+
     public E get(int index) {
         return members[index];
     }
@@ -48,8 +42,6 @@ public class Record<E extends Comparable> extends Data<E> {
         return tablekey;
         
     }
-
-
     
     @Override
     public String toString() {

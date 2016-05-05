@@ -70,7 +70,7 @@ public class DBMS<E> {
     
     public void showTables() {
         for (Table t : ((Collection<Table>) io.getTables())) {
-            System.out.println(t.toStringPretty());
+            System.out.println(t.toStringPretty(t.getAttributes(), null));
         }
     }
     

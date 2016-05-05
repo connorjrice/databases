@@ -4,10 +4,15 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 /**
- *
+ * Table class. Main components are:
+ * (HashMap<E, Class<E>>) attributes
+ *     where E = id value
+ *     and Class<E> is datatype for E
+ * (String) tablekey = identifier for table
+ * (String) primary = value of primary key
  * @author Connor
  */
-public class Table<E> {
+public class Table<E extends Comparable<Table>> extends Data {
     
     private final HashMap<E, Class<E>> attributes;
     private final String tablekey;
@@ -31,11 +36,10 @@ public class Table<E> {
         return primary;
     }
     
-    public String toStringPretty() {
-        StringBuilder s = new StringBuilder();
-        s.append("Table name: ").append(tablekey);
-        return s.toString();
-    }
+
+    public String toStringPretty(HashMap<E, Class<E>> attributes, E[] members, boolean table) {
+        return super.toStringPretty(attributes, null);
+    }    
     
     @Override
     public String toString() {
