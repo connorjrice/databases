@@ -93,8 +93,11 @@ public class DBIO<E> extends Data {
             if (file.length() > 0) {
                 System.out.println("here");
                 String s = new String(fromHex(file.readLine()));
-                int type = parse(s);
-                decide(s, type);
+                for (String parsed : s.split("\n")) {
+                    int type = parse(parsed);
+                    decide(parsed, type);
+                }
+
             } else {
                 Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE,
                         "{0} was empty!", path);
