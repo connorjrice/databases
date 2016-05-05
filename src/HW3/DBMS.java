@@ -23,7 +23,9 @@ public class DBMS<E> {
     public static final byte IND_END = 8;
     public static final byte RELT_BEG = 9; // Relation table key beg
     public static final byte RELT_END = 10;
-
+    public static final byte PRIME_BEG = 11;
+    public static final byte PRIME_END = 12;
+    
 
     private final DBIO io;
     
@@ -47,7 +49,7 @@ public class DBMS<E> {
                 attributes.put(values[i], types[i]);
             }
             Table t = new Table(attributes, key);
-            io.write(t.toString(), "Attributes: " + t.getKey());
+            io.write(t.toString(), "-1", key);
         } else {
             Logger.getLogger(Record.class.getName()).log(Level.SEVERE, "Table "
                     + "creation error: inequal number of values and types.");
@@ -66,7 +68,7 @@ public class DBMS<E> {
             E[] members, int primaryindex) {
         // TODO: Check to see if members matches schema
         Record r = new Record(members, tablekey, primaryindex);
-        io.write(r.toString(), members[primaryindex].toString());
+        io.write(r.toString(), r.getPrimary(), tablekey);
     }
     
     public <E extends Comparable<? super E>> void findRecord(String key) {

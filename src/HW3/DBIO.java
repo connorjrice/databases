@@ -50,20 +50,25 @@ public class DBIO<E> {
         } catch (IOException ex) {
             Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
     }
     
-    public void write(String input, String primary) {
+    /**
+     * 
+     * @param input the data to be written
+     * @param primary primary key, -1 for tables
+     * @param tablekey key of the table
+     */
+    public void write(String input, String primary, String tablekey) {
         try {
             RandomAccessFile dbfile = rafs.get(db);
             long startpos = positions.get(db);
             dbfile.seek(startpos);
             dbfile.writeUTF(input);
-            index.put(getHash(primary), startpos);
+            index.put(getHash(primary, tablekey), startpos);
             
             RandomAccessFile indfile = rafs.get(ind);
             indfile.seek(indfile.length());
-            indfile.writeUTF(getIndUTF(primary));
+            indfile.writeUTF(getIndUTF(primary, tablekey));
             
             updatePos(getDBBytes(input), getIndBytes(input));
         } catch (IOException ex) {
@@ -71,12 +76,13 @@ public class DBIO<E> {
         }
     }
     
-    private String getIndUTF(String primary) {
-        return getHash(primary) + DBMS.SEP + index.get(getHash(primary)).toString();
+    private String getIndUTF(String primary, String tablekey) {
+        return DBMS.IND_BEG + getHash(primary, tablekey) + DBMS.SEP +
+                index.get(getHash(primary, tablekey)).toString() + DBMS.IND_END;
     }
     
-    private int getHash(String primary) {
-        return primary.hashCode();
+    private int getHash(String primary, String tablekey) {
+        return (primary + tablekey).hashCode();
     }
     
     private int getDBBytes(String input) {

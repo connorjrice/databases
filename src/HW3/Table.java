@@ -32,6 +32,9 @@ public class Table<E> {
         s.append(DBMS.TKEY_BEG);
         s.append(key);        
         s.append(DBMS.TKEY_END);
+        s.append(DBMS.PRIME_BEG);
+        s.append(-1);
+        s.append(DBMS.PRIME_END);
         s.append(DBMS.TAB_BEG);
         for (Entry<E, Class<E>> e : attributes.entrySet()) {
             s.append(e.getKey().toString()).append(DBMS.SEP);

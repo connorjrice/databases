@@ -25,8 +25,12 @@ public class Record<E> {
         return members;
     }
     
-    public int getPrimary() {
+    public int getPrimaryIndex() {
      return primary;   
+    }
+    
+    public String getPrimary() {
+        return members[primary].toString();
     }
     
     @Override
@@ -35,16 +39,21 @@ public class Record<E> {
         sb.append(DBMS.RELT_BEG);
         sb.append(tablekey);
         sb.append(DBMS.RELT_END);
+        sb.append(DBMS.PRIME_BEG);
+        sb.append(getPrimary());
+        sb.append(DBMS.PRIME_END);
+        sb.append(DBMS.REL_BEG);
         for (int i = 0; i < members.length; i++) {
-            sb.append(DBMS.REL_BEG);
+
             if (i == members.length-1) {
                 sb.append(members[i].toString());
             } else {
                 sb.append(members[i].toString()).append(", ");                
             }
-            sb.append(DBMS.REL_END);
+
         }
-        return sb.toString().substring(0, sb.length()-2);
+        sb.append(DBMS.REL_END);
+        return sb.toString();
     }
 
     
