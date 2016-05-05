@@ -1,23 +1,14 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package HW3;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.Normalizer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.codec.binary.StringUtils;
 
 
 
@@ -36,13 +27,13 @@ public class DBMS<E> {
     public static final byte TYPE_SEP = 6;
 
     private final ArrayList<Table> tables;
-    private final HashMap index;
+    private final HashMap indices;
     
     private String tempKey = "";
     
     public DBMS() {
         this.tables = new ArrayList<>();
-        this.index = new HashMap();
+        this.indices = new HashMap();
     }    
     
     public void delete() {
@@ -66,11 +57,15 @@ public class DBMS<E> {
             }
             Table t = new Table(attributes, key);
             tables.add(t);
-            index.put(key, t);
+            indices.put(key, t);
         } else {
             Logger.getLogger(Record.class.getName()).log(Level.SEVERE, "Table "
                     + "creation error: inequal number of values and types.");
         }
+    }
+    
+    public int getHash(String key, String record) {
+        return (key + record).hashCode();
     }
     
     public <E extends Comparable<? super E>> void insertRecord(String key, 
@@ -100,10 +95,9 @@ public class DBMS<E> {
     
     public void readDB() {
         tables.clear();
-        index.clear();
+        indices.clear();
         try (RandomAccessFile raf = new RandomAccessFile("test.db", "rw")) {
             raf.seek(0);
-                //String s = raf.readLine().trim();
                 StringBuilder sb = new StringBuilder();
                 char c;
                 while (raf.getFilePointer() < raf.length()) {
@@ -112,10 +106,7 @@ public class DBMS<E> {
                     }
                     decide(sb.toString().trim(), parse(sb.toString().trim()));
                     sb = new StringBuilder();
-                    
                 }
-                
-
                 raf.close();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, null, ex);
@@ -125,10 +116,7 @@ public class DBMS<E> {
     }
     
     private int parse(String s) {
-/*        byte[] bytes = s.getBytes();
-        for (byte b : bytes) {
-            System.out.println(b);
-        }*/if (s.startsWith("0") && s.endsWith("1")) {
+        if (s.startsWith("0") && s.endsWith("1")) {
             return 0; // key
         } else if (s.startsWith("2") && s.endsWith("3")) {
             return 1; // table
@@ -138,18 +126,26 @@ public class DBMS<E> {
             return -1;   
         }
     }
-    
-    /**
-     * Remember: we are being passed the string without special chars.
-     * @param s
-     * @param i 
-     */
+
     private void decide(String s, int i) {
         if (i == 0) { 
             // s is a key, store it
-            tempKey = s;
+            readKey(s);
         } else if (i == 1) { 
-            // Put a table together if we have a tempKey
+            readTable(s);
+        } else if (i == 2) { // relation
+            readRelation(s);
+        } else {
+            Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, "Parsing error: invalid decision value.");     
+        }
+    }
+    
+    private void readKey(String s) {
+        tempKey = s;
+    }
+    
+    private void readTable(String s) {
+        // Put a table together if we have a tempKey
             if (tempKey.length() > 0) { 
                 // Fix our input so that Java doesn't throw ClassNotFound
                 //String[] pairs = fixString(s);
@@ -171,34 +167,17 @@ public class DBMS<E> {
             } else {
                 Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, "Parsing error: no temp key but found table.");
             }
-        } else if (i == 2) { // relation
-            
-        } else {
-            Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, "Parsing error: invalid decision value.");
-        }
     }
     
-
-    
-    private String readKey(String s) {
-        if (s.startsWith("2") && s.endsWith("3")) {
-            return s.substring(1,s.length()-1);
-        }
-        else {
-            return "nokey";
-        }
+    private void readRelation(String s) {
+        s = s.substring(1, s.length()-1);
     }
     
     
     public void writeDB() {
         try (RandomAccessFile raf = new RandomAccessFile("test.db", "rw")) {
             for (Table t : tables) {
-                String s = t.toString();
-
-                raf.writeChars(s);
-                /*for (char c : s.toCharArray()) {
-                    raf.writeChar(c);
-                }*/
+                raf.writeChars(t.toString());
             }
             raf.close();
         } catch (FileNotFoundException ex) {
@@ -209,7 +188,7 @@ public class DBMS<E> {
     }
     
     private Table findTable(String key) {
-        return (Table) index.get(key);
+        return (Table) indices.get(key);
     }
     
 }

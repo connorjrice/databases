@@ -42,7 +42,7 @@ public class Table<E> {
         s += DBMS.TKEY_BEG;
         s += key;        
         s += DBMS.TKEY_END;
-        s += "\n";
+        //s += "\n";
         
         s += DBMS.TAB_BEG;
         for (Entry<E, Class<E>> e : attributes.entrySet()) {
@@ -53,13 +53,13 @@ public class Table<E> {
         
         s = s.substring(0,s.length()-2);//remove last ", "
         s += DBMS.TAB_END;
-        s += "\n";        
+        //s += "\n";        
         
         for (Record r : values) {
             s += DBMS.REL_BEG;
             s += r.toString();
             s += DBMS.REL_END;
-            s += "\n";            
+            //s += "\n";            
         }
         
         return s;
