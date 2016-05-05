@@ -38,17 +38,31 @@ public class RecordTest {
         d.insertRecord("info", record, 0);
         record = new String[]{"boris", "m", "2"};
         d.insertRecord("info", record, 0);
-        //d.findRecord("info", "connor");
-        //d.writeDB();
+        record = new String[]{"clara", "f", "2"};
+        d.insertRecord("info", record, 0);
+        record = new String[]{"yuliya", "f", "23"};        
+        d.insertRecord("info", record, 0);        
+        
+        d.createTable(values, types, "secrets", 0);
+        record = new String[]{"connor", "m", "23", "cheese"};
+        
+        d.insertRecord("info", record, 3);
+        record = new String[]{"boris", "m", "2", "wires"};
+        d.insertRecord("info", record, 0);
+        record = new String[]{"clara", "f", "2", "moths"};
+        d.insertRecord("info", record, 0);
+        record = new String[]{"yuliya", "f", "23", "ramen"};        
+        d.insertRecord("info", record, 0);       
     }
     
     public static void read() {
         DBMS d = new DBMS("test.db", "index.db");
         d.showTables();
-        //d.findRecord("connor", "info");
+        d.findRecord("connor", "info");
         System.out.println(d.deleteRecord("connor", "info"));
+        d.findRecord("connor", "info");                
         //d.findRecord("boris", "info");
-        //d.findRecord("connor", "info");        
+
         //d.readDB();
         //d.findRecord("info", "connor");
     }

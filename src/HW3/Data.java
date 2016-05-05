@@ -10,38 +10,12 @@ import java.util.Set;
  * @author Connor
  */
 public class Data<E>  {
-    
+    private static final String NODICE = "--*i got nothin'*--";
     
     public Data() {
 
     }
     
-    /**
-     * Returns a string with pretty formatting.
-     * Thanks OCD!
-     * @param attributes
-     * @param members
-     * @return 
-     */
-    public <E extends Comparable>
-        String toStringPretty(HashMap<E, Class<E>> attributes, E[] members) {
-        StringBuilder sb = new StringBuilder();
-        String labels = "";
-        String record = "";
-        Object[] t = getTypes(attributes);
-        String border = getBorder((String) t[0]);        
-        sb.append(border).append("\n");                    
-
-        labels = "| " + getLabels(t) + "|\n";
-        record = "| " + getRecord(t, members) + "|\n";
-        sb.append("| ").append((String) t[0]).append("|\n");                    
-        sb.append(labels);            
-        sb.append(record);            
-
-	sb.append(border);
-        return sb.toString();
-    }
-        
     /**
      * Returns a string with pretty formatting.
      * Thanks OCD!
@@ -59,17 +33,33 @@ public class Data<E>  {
         sb.append(border).append("\n");                    
 
         labels = "| " + getLabels(t) + "|\n";
-        record = "| " + getRecord(t, tablekey) + "|\n";
-        sb.append(record);                            
-        sb.append("| ").append((String) t[0]).append("|\n");                    
-
-        sb.append(labels);            
-
+        if (tablekey.compareTo("") == 0) {
+            // We're not dealing with a table
+            if (((String)t[0]).compareTo(NODICE) == 0)  {
+                // We didn't find a record
+                //record = "| " + getRecord(t, members) + "|\n";
+                sb.append("| ").append((String) t[0]).append("|\n");                    
+            } else {
+                // We did find a record, so print no results.
+                record = "| " + getRecord(t, members) + "|\n";
+                sb.append("| ").append((String) t[0]).append("|\n");                    
+                sb.append(labels);            
+                sb.append(record);                    
+            }
+             
+        } else {
+            labels = "| " + getLabels(t) + "|\n";
+            record = "| " + getRecord(t, tablekey) + "|\n";
+            sb.append(record);                            
+            sb.append("| ").append((String) t[0]).append("|\n");
+            sb.append(labels);
+        }
+       
 
 	sb.append(border);
         return sb.toString();
-    }        
-    
+    }
+
     /**
      * Returns a... struct? 
      * t[0] = (String) types
@@ -88,7 +78,7 @@ public class Data<E>  {
         });
         
         if (positions.isEmpty()) {
-            picky.append("--*i got nothin'*--");
+            picky.append(NODICE);
         }
         return new Object[]{picky.toString(),positions, attributes};
     }
