@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,7 +31,7 @@ public class DBIO<E> {
     private static final String RELATION_INNER = "(ΛΜ)|(ΝΕ)|(,)";
     
     private static char[] hexArray = "0123456789ABCDEF".toCharArray();
-    private ArrayList<Table> tables;    
+    private final HashMap<Integer, Table> tables;    
     
     public DBIO(String db, String ind) {
         //delete();
@@ -39,7 +40,7 @@ public class DBIO<E> {
         this.ind = ind;
         this.rafs = new HashMap<>();
         this.curPositions = new HashMap<>();
-        this.tables = new ArrayList<>();        
+        this.tables = new HashMap<>();        
         initialize();
     }
     
@@ -49,7 +50,7 @@ public class DBIO<E> {
             this.ind = ind;
             this.rafs = new HashMap<>();
             this.curPositions = new HashMap<>();
-            this.tables = new ArrayList<>();            
+            this.tables = new HashMap<>();            
             if (delete) {
                 try {
                     Files.delete(Paths.get("test.db"));
@@ -108,6 +109,10 @@ public class DBIO<E> {
         }
     }
     
+    public HashMap<E, Class<E>> getAttributes(int hashCode) {
+        return tables.get(hashCode).getAttributes();
+    }
+    
     private Long[] parseIndexString(int hashCode) {
         String[] split = index.get(hashCode).split(",");
         return new Long[]{Long.parseLong(split[0]),Long.parseLong(split[1])};
@@ -145,7 +150,7 @@ public class DBIO<E> {
     }
     
     public void addTable(Table t) {
-        tables.add(t);
+        tables.put(getHash((E) t.getPrimary(), t.getKey()), t);
     }
     
     
@@ -179,22 +184,33 @@ public class DBIO<E> {
         return sb.toString();
     }
     
-    private int getHash(E primary, String tablekey) {
+    /**
+     * Returns the hash of the primary key and tablekey.
+     * @param primary
+     * @param tablekey
+     * @return 
+     */
+    protected int getHash(E primary, String tablekey) {
         return (primary.toString() + tablekey).hashCode();
     }
     
+    private int getHash(Table t) {
+        return (t.getPrimary() + t.getKey()).hashCode();
+    }
     
     private void updatePos(long dbOffset, long indOffset) {
         curPositions.put(db, curPositions.get(db) + dbOffset);
         curPositions.put(ind, curPositions.get(ind) + indOffset);
     }
     
-    public void hashLookup(E primary, String tablekey) {
-        Record r;
-        int hash = getHash(primary,tablekey);
-        r = parseRelation(parseIndexString(hash));
-        
-        //System.out.println(index.get(getHash(primary, tablekey)));
+    /**
+     * Return a record from the db file.
+     * @param primary
+     * @param tablekey
+     * @return 
+     */
+    public Record hashLookup(E primary, String tablekey) {
+        return parseRelation(parseIndexString(getHash(primary,tablekey)));
     }
     
     private Record parseRelation(Long[] bounds) {
@@ -212,7 +228,6 @@ public class DBIO<E> {
             // Trim special chars and split
             String s = sb.toString().substring(1,sb.length()-1);
             String[] split = s.split(RELATION_INNER);
-            System.out.println(Arrays.toString(split));
             int primaryindex = -1;
             boolean found = false;
             for (int i = 2; i < split.length; i++) {
@@ -222,7 +237,6 @@ public class DBIO<E> {
                 }
             }
             r = new Record(Arrays.copyOfRange(split, 2, 4), split[0],primaryindex);
-            System.out.println(r.toString());
        } catch (IOException ex) {
             Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -270,7 +284,8 @@ public class DBIO<E> {
                         .log(Level.SEVERE, null, ex);
             }
         }
-        tables.add(new Table(attributes, pairs[0]));
+        Table t = new Table(attributes, pairs[0]);
+        tables.put(getHash(t), t);
     }
     
     private void readRelation(String s) {
@@ -283,8 +298,8 @@ public class DBIO<E> {
         index.put(Integer.parseInt(pair[0]), pair[1]);
     }
     
-    public ArrayList<Table> getTables() {
-        return tables;
+    public Collection<Table> getTables() {
+        return tables.values();
     }
     
     

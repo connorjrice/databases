@@ -1,5 +1,7 @@
 package HW3;
 
+import java.util.HashMap;
+
 /**
  * TKEY_BEG*keyvalue*TKEY_END*TAB_BEG*REL_BEG*...*REL_END*TAB_END*
  * @author Connor
@@ -32,6 +34,11 @@ public class Record<E> {
     public String getPrimary() {
         return members[primary].toString();
     }
+
+    public String toStringPretty(HashMap<E, Class<E>> attributes) {
+        return "";
+    }
+
     
     @Override
     public String toString() {
@@ -50,12 +57,10 @@ public class Record<E> {
             } else {
                 sb.append(members[i].toString()).append(", ");                
             }
-
         }
         sb.append(DBMS.REL_END).append('\n');
         return sb.toString();
     }
-
     
  
     

@@ -1,6 +1,7 @@
 package HW3;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,6 +27,7 @@ public class DBMS<E> {
     public static final char RELT_END = 'Λ';
     public static final char PRIME_BEG = 'Μ';
     public static final char PRIME_END = 'Ν';
+    public static final String TABLE = "TABLE";
 
     private final DBIO io;
     
@@ -58,7 +60,7 @@ public class DBMS<E> {
             }
             Table t = new Table(attributes, key);
             io.addTable(t);
-            io.write(t.toString(), "TABLE", key);
+            io.write(t.toString(), TABLE, key);
         } else {
             Logger.getLogger(Record.class.getName()).log(Level.SEVERE, "Table "
                     + "creation error: inequal number of values and types.");
@@ -66,7 +68,7 @@ public class DBMS<E> {
     }
     
     public void showTables() {
-        for (Table t : ((ArrayList<Table>) io.getTables())) {
+        for (Table t : ((Collection<Table>) io.getTables())) {
             System.out.println(t.toStringPretty());
         }
     }
@@ -84,7 +86,11 @@ public class DBMS<E> {
     }
     
     public <E extends Comparable<? super E>> void findRecord(E primarykey, String tablekey) {
-        io.hashLookup(primarykey, tablekey);
+        
+        Record r = io.hashLookup(primarykey, tablekey);
+                r.toStringPretty(
+                        io.getAttributes(
+                                io.getHash(TABLE, tablekey)));
     }
     
     public <E extends Comparable<? super E>> void modifyRecord() {
