@@ -61,7 +61,7 @@ public class Record<E extends Comparable<? super E>> extends Data {
             }
         }
         sb.append(DBMS.REL_END).append('\n');
-        return toHexString(sb.toString().getBytes());
+        return sb.toString();
     }
     
  

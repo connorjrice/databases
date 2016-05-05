@@ -94,7 +94,13 @@ public class DBIO<E> extends Data {
                 
                 sb.append(file.readLine());
                 String[] split = splitStringEvery(sb.toString(), 2);
-                System.out.println(Arrays.toString(split));
+                System.out.println(Arrays.toString(split));                
+                Integer[] converted = new Integer[split.length];
+                for (int i = 0; i < converted.length; i++) {
+                    converted[i] = (int)  Long.parseLong("ffff8000", 16);
+                }
+                System.out.println(Arrays.toString(converted));                                
+                
                 int type = parse(sb.toString());
                 decide(sb.toString(), type);
             } else {
@@ -178,7 +184,7 @@ public class DBIO<E> extends Data {
             RandomAccessFile dbfile = rafs.get(db);
             long dbstart = curPositions.get(db);
             dbfile.seek(dbstart);
-            dbfile.writeChars(input);
+            dbfile.write(toHex(input));
             long dbdiff = dbfile.getFilePointer() - dbstart;
             index.put(getHash(primary, tablekey), (Long.toString(dbstart) + "," +
                 Long.toString(dbdiff+dbstart)));
@@ -187,8 +193,8 @@ public class DBIO<E> extends Data {
             RandomAccessFile indfile = rafs.get(ind);
             long indstart = curPositions.get(ind);
             indfile.seek(indstart);
-            String inds = getIndUTF(primary,tablekey);
-            indfile.writeChars(inds);
+            byte[] ind = getInd(primary, tablekey);
+            indfile.write(ind);
             long inddiff = indfile.getFilePointer() - indstart;
             
             if (update) {
@@ -204,17 +210,14 @@ public class DBIO<E> extends Data {
         tables.put(getHash((E) t.getPrimary(), t.getTableKey()), t);
     }
     
-    
-
-    
-    private String getIndUTF(E primary, String tablekey) {
+    private byte[] getInd(E primary, String tablekey) {
         StringBuilder sb = new StringBuilder();
         sb.append(DBMS.IND_BEG);
         sb.append(getHash(primary, tablekey));
         sb.append(DBMS.SEP);
         sb.append(index.get(getHash(primary, tablekey)));
         sb.append(DBMS.IND_END).append('\n');
-        return toHexString(sb.toString().getBytes());
+        return toHex(sb.toString());
     }
     
     /**
