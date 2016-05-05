@@ -27,7 +27,7 @@ public class DBIO<E> {
     
     private static final String TABLE_INNER = "(ΒΜ)|(ΝΓ)|(Η)|(,)";
     private static final String INDEX_INNER = "(Η)";
-    private static final String RELATION_INNER = "(ΛΜ)|(ΝΕ)";
+    private static final String RELATION_INNER = "(ΛΜ)|(ΝΕ)|(,)";
     
     private static char[] hexArray = "0123456789ABCDEF".toCharArray();
     private ArrayList<Table> tables;    
@@ -198,7 +198,7 @@ public class DBIO<E> {
     }
     
     private Record parseRelation(Long[] bounds) {
-        Record r;
+        Record r = null;
         try {
             RandomAccessFile file = rafs.get(db);
             file.seek(bounds[0]);
@@ -212,13 +212,22 @@ public class DBIO<E> {
             // Trim special chars and split
             String s = sb.toString().substring(1,sb.length()-1);
             String[] split = s.split(RELATION_INNER);
-            
             System.out.println(Arrays.toString(split));
+            int primaryindex = -1;
+            boolean found = false;
+            for (int i = 2; i < split.length; i++) {
+                if (split[1].compareTo(split[i]) == 0 & !found) {
+                    primaryindex = i-2;
+                    found = true;
+                }
+            }
+            r = new Record(Arrays.copyOfRange(split, 2, 4), split[0],primaryindex);
+            System.out.println(r.toString());
        } catch (IOException ex) {
             Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        return null;
+       
+        return r;
     }
     
     private int parse(String s) {
