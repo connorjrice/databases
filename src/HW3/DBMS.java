@@ -69,10 +69,6 @@ public class DBMS<E> {
         symbols.put(PRIME_END, 12);                
     }
     
-    public void buildIndices() {
-     io.buildIndices();   
-    }
-    
     /**
      * Create a new table.
      * @param attributes

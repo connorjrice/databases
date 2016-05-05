@@ -5,6 +5,7 @@
  */
 package HW3;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -24,7 +25,8 @@ import javax.xml.bind.DatatypeConverter;
  */
 public class DBIO<E> {
     private String tempKey = "";
-    private static final Set<Character> VALUES = new HashSet<>(Arrays.asList(DBMS.IND_END, DBMS.REL_END, DBMS.TAB_END, DBMS.TKEY_END));
+    private static final Set<Character> VALUES = new HashSet<>(Arrays.
+            asList(DBMS.IND_END, DBMS.REL_END, DBMS.TAB_END, DBMS.TKEY_END));
     private final String db, ind;
 
     private final HashMap<Integer, Long> index;
@@ -38,13 +40,41 @@ public class DBIO<E> {
         this.db = db;
         this.ind = ind;
         this.rafs = new HashMap<>();
-        this.positions = new HashMap<>();
-
+        this.positions = new HashMap<>();        
+        initialize();
+    }
+    
+    public DBIO(String db, String ind, boolean delete) {
+            this.index = new HashMap<>();
+            this.db = db;
+            this.ind = ind;
+            this.rafs = new HashMap<>();
+            this.positions = new HashMap<>();
+            if (delete) {
+                try {
+                    Files.delete(Paths.get("test.db"));
+                    Files.delete(Paths.get("index.db"));
+                } catch (IOException ex) {
+                    Logger.getLogger(Record.class.getName()).
+                            log(Level.SEVERE, null, ex);
+                }
+            }            
+            initialize();
+    }
+        
+    private void initialize() {
         try {
+
             rafs.put(db, new RandomAccessFile(db, "rw"));
             positions.put(db, rafs.get(db).length());
             rafs.put(ind, new RandomAccessFile(ind, "rw"));
             positions.put(ind, rafs.get(ind).length());
+            if (new File(db).exists()) {
+                
+            }
+            if(new File(ind).exists()) {
+                 parseIndices();                
+            }            
         } catch (FileNotFoundException ex) {
             Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -52,31 +82,13 @@ public class DBIO<E> {
         }
     }
     
-        public DBIO() {
-            this.index = new HashMap<>();
-            this.db = "test.db";
-            this.ind = "index.db";
-            this.rafs = new HashMap<>();
-            this.positions = new HashMap<>();
-            
-            try {
-                rafs.put(db, new RandomAccessFile(db, "rw"));
-                positions.put(db, rafs.get(db).length());
-                rafs.put(ind, new RandomAccessFile(ind, "rw"));
-                positions.put(ind, rafs.get(ind).length());
-                buildIndices();
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    
-    
-    public void buildIndices() {
+    /**
+     * Parses the index file and builds the HashMap.
+     */
+    private void parseIndices() {
         try {
             RandomAccessFile indfile = rafs.get(ind);
-            if (indfile.length()> 0) {
+            if (indfile.length() > 0) {
                 StringBuilder sb = new StringBuilder();
                 char c;
                 while (indfile.getFilePointer() < indfile.length()) {
@@ -88,7 +100,8 @@ public class DBIO<E> {
                     sb = new StringBuilder();
                 }
             } else {
-                Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, "Index file was empty!");
+                Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE,
+                        "Index file was empty!");
             }
             
            
@@ -113,7 +126,6 @@ public class DBIO<E> {
             dbfile.writeChars(input);
             index.put(getHash(primary, tablekey), dbstart);
             long dbdiff = dbfile.getFilePointer() - dbstart;
-            
             
             RandomAccessFile indfile = rafs.get(ind);
             long indstart = positions.get(ind);
@@ -207,7 +219,8 @@ public class DBIO<E> {
         }
         
         else {
-            Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, "Parsing error: invalid decision value.");     
+            Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, 
+                    "Parsing error: invalid decision value.");     
         }
     }
     
@@ -236,7 +249,8 @@ public class DBIO<E> {
                 }
                 tempKey = "";
             } else {
-                Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, "Parsing error: no temp key but found table.");
+                Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE,
+                        "Parsing error: no temp key but found table.");
             }
     }
     
@@ -245,25 +259,12 @@ public class DBIO<E> {
     }
     
     private void readIndex(String s) {
-        s = s.substring(1, s.length()-1); // strip out trailing and leading special chars      
+        s = s.substring(1, s.length()-1); // trim special chars     
         String sep = " " + DBMS.SEP;
         sep = sep.substring(1);
         String[] pair = s.split(sep);
         index.put(Integer.parseInt(pair[0]), Long.parseLong(pair[1]));
     }
-    
-   /* public void writeIndex(HashMap indices) {
-        try (RandomAccessFile raf = new RandomAccessFile("index.db", "rw")) {
-            for(Object e : indices.entrySet()) {
-                raf.writeChars(e.toString());
-            }
-            raf.close();
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }&*/
     
     
 }
