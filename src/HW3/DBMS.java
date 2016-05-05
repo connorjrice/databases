@@ -33,13 +33,12 @@ public class DBMS<E> {
     
     
     private final String db,index;
-    private ArrayList<Table> tables;
+
     
     public DBMS(String db, String index) {
         this.db = db;
         this.index = index;
         this.io = new DBIO(db, index);
-        this.tables = new ArrayList<>();
         this.symbols = new HashMap<>();
         buildSymbols();
     }
@@ -48,7 +47,6 @@ public class DBMS<E> {
         this.db = "test.db";
         this.index = "index.db";
         this.io = new DBIO(db, index);
-        this.tables = new ArrayList<>();
         this.symbols = new HashMap<>();
         buildSymbols();
     }
@@ -82,11 +80,17 @@ public class DBMS<E> {
                 attributes.put(values[i], types[i]);
             }
             Table t = new Table(attributes, key);
-            tables.add(t);
+            io.addTable(t);
             io.write(t.toString(), "TABLE", key);
         } else {
             Logger.getLogger(Record.class.getName()).log(Level.SEVERE, "Table "
                     + "creation error: inequal number of values and types.");
+        }
+    }
+    
+    public void showTables() {
+        for (Table t : ((ArrayList<Table>) io.getTables())) {
+            System.out.println(t.toStringPretty());
         }
     }
     

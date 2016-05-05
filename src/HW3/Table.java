@@ -27,6 +27,12 @@ public class Table<E> {
         return attributes;
     }
     
+    public String toStringPretty() {
+        StringBuilder s = new StringBuilder();
+        s.append("Table name: ").append(key);
+        return s.toString();
+    }
+    
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder();

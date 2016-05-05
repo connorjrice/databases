@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,9 +33,10 @@ public class DBIO<E> {
     private final HashMap<String, RandomAccessFile> rafs;
     private final HashMap<String, Long> positions;
     
-    private static final String TABLE_INNER = "(ΒΜ)|(ΝΓ)|(Η)";
+    private static final String TABLE_INNER = "(ΒΜ)|(ΝΓ)|(Η)|(,)";
     
-    private static char[] hexArray = "0123456789ABCDEF".toCharArray();     
+    private static char[] hexArray = "0123456789ABCDEF".toCharArray();
+    private ArrayList<Table> tables;    
     
     public DBIO(String db, String ind) {
         //delete();
@@ -42,7 +44,8 @@ public class DBIO<E> {
         this.db = db;
         this.ind = ind;
         this.rafs = new HashMap<>();
-        this.positions = new HashMap<>();        
+        this.positions = new HashMap<>();
+        this.tables = new ArrayList<>();        
         initialize();
     }
     
@@ -52,6 +55,7 @@ public class DBIO<E> {
             this.ind = ind;
             this.rafs = new HashMap<>();
             this.positions = new HashMap<>();
+            this.tables = new ArrayList<>();            
             if (delete) {
                 try {
                     Files.delete(Paths.get("test.db"));
@@ -175,6 +179,10 @@ public class DBIO<E> {
         }
     }
     
+    public void addTable(Table t) {
+        tables.add(t);
+    }
+    
     
     public static String toHexString(byte[] bytes) {
         return DatatypeConverter.printHexBinary(bytes);
@@ -250,18 +258,17 @@ public class DBIO<E> {
         System.out.println(s);
         String[] pairs = s.split(TABLE_INNER);
         System.out.println(Arrays.toString(pairs));
-//        HashMap<E, Class<E>> attributes = new HashMap();
-        /*for (String d : pairs) {
-            String[] pair = d.split("6");
-            pair[1] = pair[1].trim();
+        HashMap<E, Class<E>> attributes = new HashMap();
+        for (int i = 2; i < pairs.length-1; i+=2) {
             try {
-                Class<E> type = (Class<E>) Class.forName(pair[1]);
-                attributes.put((E)pair[0], type);
+                Class<E> type = (Class<E>) Class.forName(pairs[i+1]);
+                attributes.put((E)pairs[i], type);
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(DBMS.class.getName())
                         .log(Level.SEVERE, null, ex);
             }
-        }*/
+        }
+        tables.add(new Table(attributes, pairs[0]));
     }
     
     private void readRelation(String s) {
@@ -274,6 +281,10 @@ public class DBIO<E> {
         sep = sep.substring(1);
         String[] pair = s.split(sep);
         index.put(Integer.parseInt(pair[0]), Long.parseLong(pair[1]));
+    }
+    
+    public ArrayList<Table> getTables() {
+        return tables;
     }
     
     

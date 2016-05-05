@@ -37,7 +37,9 @@ public class RecordTest {
     
     public static void read() {
         DBMS d = new DBMS("test.db", "index.db");
+        d.showTables();
         d.findRecord("connor", "info");
+        
         //d.readDB();
         //d.findRecord("info", "connor");
     }
