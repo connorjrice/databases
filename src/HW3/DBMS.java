@@ -25,15 +25,22 @@ public class DBMS<E> {
     public static final byte REL_BEG = 4;
     public static final byte REL_END = 5;
     public static final byte TYPE_SEP = 6;
+    public static final byte IND_BEG = 7;
+    public static final byte IND_END = 8;
+    public static final byte PNT_ORG = 9; // Pointer origin
+    public static final byte PNT_DST = 10;// Pointer dest
 
     private final ArrayList<Table> tables;
     private final HashMap indices;
-    
-    private String tempKey = "";
+    private final long curPosition;
+    private final DBIO io;
+
     
     public DBMS() {
         this.tables = new ArrayList<>();
         this.indices = new HashMap();
+        this.curPosition = 0l;
+        this.io = new DBIO();
     }    
     
     public void delete() {
@@ -72,8 +79,9 @@ public class DBMS<E> {
             E[] members) {
         // TODO: Check to see if members matches schema
         Table t = findTable(key);
+        Record r = new Record(members);
         t.add(new Record(members));
-
+        indices.put(getHash(key,r.toString()), curPosition);
     }
     
     public void findRecord(String key, E member) {
@@ -94,99 +102,13 @@ public class DBMS<E> {
     }
     
     public void readDB() {
-        tables.clear();
-        indices.clear();
-        try (RandomAccessFile raf = new RandomAccessFile("test.db", "rw")) {
-            raf.seek(0);
-                StringBuilder sb = new StringBuilder();
-                char c;
-                while (raf.getFilePointer() < raf.length()) {
-                    while ((c = raf.readChar()) != '\n'){
-                        sb.append(c);
-                    }
-                    decide(sb.toString().trim(), parse(sb.toString().trim()));
-                    sb = new StringBuilder();
-                }
-                raf.close();
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        io.readDB(tables, indices);
     }
-    
-    private int parse(String s) {
-        if (s.startsWith("0") && s.endsWith("1")) {
-            return 0; // key
-        } else if (s.startsWith("2") && s.endsWith("3")) {
-            return 1; // table
-        } else if (s.startsWith("4") && s.endsWith("5")) {
-            return 2; // relation
-        } else {
-            return -1;   
-        }
-    }
-
-    private void decide(String s, int i) {
-        if (i == 0) { 
-            // s is a key, store it
-            readKey(s);
-        } else if (i == 1) { 
-            readTable(s);
-        } else if (i == 2) { // relation
-            readRelation(s);
-        } else {
-            Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, "Parsing error: invalid decision value.");     
-        }
-    }
-    
-    private void readKey(String s) {
-        tempKey = s;
-    }
-    
-    private void readTable(String s) {
-        // Put a table together if we have a tempKey
-            if (tempKey.length() > 0) { 
-                // Fix our input so that Java doesn't throw ClassNotFound
-                //String[] pairs = fixString(s);
-                s = s.substring(1, s.length()-1);
-                String[] pairs = s.split(",");
-                HashMap<E, Class<E>> attributes = new HashMap();
-                for (String d : pairs) {
-                    String[] pair = d.split("6");
-                    pair[1] = pair[1].trim();
-                    try {
-                        Class<E> type = (Class<E>) Class.forName(pair[1]);
-                        attributes.put((E)pair[0], type);
-                    } catch (ClassNotFoundException ex) {
-                        Logger.getLogger(DBMS.class.getName())
-                                .log(Level.SEVERE, null, ex);
-                    }
-                }
-                tempKey = "";
-            } else {
-                Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, "Parsing error: no temp key but found table.");
-            }
-    }
-    
-    private void readRelation(String s) {
-        s = s.substring(1, s.length()-1);
-    }
-    
     
     public void writeDB() {
-        try (RandomAccessFile raf = new RandomAccessFile("test.db", "rw")) {
-            for (Table t : tables) {
-                raf.writeChars(t.toString());
-            }
-            raf.close();
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        io.writeDB(tables);
     }
-    
+
     private Table findTable(String key) {
         return (Table) indices.get(key);
     }
