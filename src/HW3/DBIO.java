@@ -92,10 +92,10 @@ public class DBIO<E> extends Data {
             if (file.length() > 0) {
                 System.out.println("here");
                 StringBuilder sb = new StringBuilder();
+                file.seek(0);
+                String line = file.readUTF();
 
-                
-                sb.append(fromHex(file.readUTF().getBytes()));
-                
+                sb.append(fromHex(line));
                 
                 int type = parse(sb.toString());
                 decide(sb.toString(), type);
@@ -108,6 +108,33 @@ public class DBIO<E> extends Data {
             Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    private int parse(String s) {
+        if (s.charAt(0) == DBMS.TKEY_BEG && s.indexOf(DBMS.TAB_END) > 0) {
+            return 0; // Table
+        } else if (s.charAt(0) == DBMS.RELT_BEG && s.indexOf(DBMS.REL_END) > 0) {
+            return 1; // relation
+        } else if (s.charAt(0) == DBMS.IND_BEG && s.indexOf(DBMS.IND_END) > 0) {
+            return 2; // index
+        } else {
+            return -1;
+        }
+    }
+
+    private void decide(String s, int i) {
+        if (i == 0) {
+            readTable(s);            
+        } else if (i == 1) { 
+            // Relations are only parsed when they've been looked up through
+            // the hash.
+            //readRelation(s);
+        } else if (i == 2) {
+            readIndex(s);
+        } else {
+            Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, 
+                    "Parsing error: invalid decision value.");     
+        }
+    }    
 
     
     /*
@@ -135,9 +162,8 @@ public class DBIO<E> extends Data {
             while (file.getFilePointer() < bounds[1]) {
                 hexbytes[i] = file.readByte();
             }
-            String s = Integer.toHexString(i);
-            System.out.println(s);
-            
+            String s = 
+                    "";
             // Trim special chars and split
             //String s = sb.toString().substring(1,sb.length()-1);
             String[] split = s.split(RELATION_SPLIT);
@@ -180,7 +206,7 @@ public class DBIO<E> extends Data {
             RandomAccessFile dbfile = rafs.get(db);
             long dbstart = curPositions.get(db);
             dbfile.seek(dbstart);
-            dbfile.write(toHex(input));
+            dbfile.writeBytes(toHex(input));
             long dbdiff = dbfile.getFilePointer() - dbstart;
             index.put(getHash(primary, tablekey), (Long.toString(dbstart) + "," +
                 Long.toString(dbdiff+dbstart)));
@@ -189,8 +215,8 @@ public class DBIO<E> extends Data {
             RandomAccessFile indfile = rafs.get(ind);
             long indstart = curPositions.get(ind);
             indfile.seek(indstart);
-            byte[] ind = getInd(primary, tablekey);
-            indfile.write(ind);
+            indfile.writeBytes(getInd(primary, tablekey));
+
             long inddiff = indfile.getFilePointer() - indstart;
             
             if (update) {
@@ -206,7 +232,7 @@ public class DBIO<E> extends Data {
         tables.put(getHash((E) t.getPrimary(), t.getTableKey()), t);
     }
     
-    private byte[] getInd(E primary, String tablekey) {
+    private String getInd(E primary, String tablekey) {
         StringBuilder sb = new StringBuilder();
         sb.append(DBMS.IND_BEG);
         sb.append(getHash(primary, tablekey));
@@ -272,32 +298,7 @@ public class DBIO<E> extends Data {
     }
     
 
-    private int parse(String s) {
-        if (s.charAt(0) == DBMS.TKEY_BEG && s.indexOf(DBMS.TAB_END) > 0) {
-            return 0; // Table
-        } else if (s.charAt(0) == DBMS.RELT_BEG && s.indexOf(DBMS.REL_END) > 0) {
-            return 1; // relation
-        } else if (s.charAt(0) == DBMS.IND_BEG && s.indexOf(DBMS.IND_END) > 0) {
-            return 2; // index
-        } else {
-            return -1;
-        }
-    }
 
-    private void decide(String s, int i) {
-        if (i == 0) {
-            readTable(s);            
-        } else if (i == 1) { 
-            // Relations are only parsed when they've been looked up through
-            // the hash.
-            //readRelation(s);
-        } else if (i == 2) {
-            readIndex(s);
-        } else {
-            Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, 
-                    "Parsing error: invalid decision value.");     
-        }
-    }
     
     public HashMap<E, Class<E>> getAttributes(String tablekey) {
         try {

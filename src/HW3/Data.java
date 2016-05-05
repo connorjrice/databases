@@ -1,5 +1,6 @@
 package HW3;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -173,22 +174,38 @@ public class Data<E>  {
         return sb.toString();
     }    
     
-    public static byte[] toHex(String s) {
+    public static String toHex(String s) {
         try {
-            if(s.length()%2==1) {
+            byte[] bytes = s.getBytes("UTF-8");                    
+            return DatatypeConverter.printHexBinary(bytes);            
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(Data.class.getName()).log(Level.SEVERE, null, ex);
+            return DatatypeConverter.printHexBinary(s.getBytes());
+        }
+
+        //try {
+            /*if(s.length()%2==1) {
                 s = '\n'+s;
-            }
-            return DatatypeConverter.parseHexBinary(s);            
-        } catch (IllegalArgumentException i) {
+            }*/
+            
+
+            //return DatatypeConverter.parseHexBinary(s);            
+        /*} catch (IllegalArgumentException i) {
             Logger.getLogger(Data.class.getName()).log(Level.SEVERE,
                         "Illegal character: ", i);            
 
         }
-        return DatatypeConverter.parseHexBinary(s);
+        return DatatypeConverter.parseHexBinary(s);*/
     }
         
-    public static String fromHex(byte[] bytes) {
-        return DatatypeConverter.printHexBinary(bytes);
+    public static byte[] fromHex(String b) {
+       // char[] c = s.toCharArray();
+
+//       int hexToInt = Integer.parseInt(b, 16);
+
+         return b.getBytes();
+       //return DatatypeConverter.parseHexBinary(b);
+
         
     }
     

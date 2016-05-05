@@ -10,27 +10,78 @@ import java.util.logging.Logger;
 
 
 /**
- 
+ 	feff01c3
+	LATIN CAPITAL LETTER DZ WITH CARON (U+01C4)	feff01c4
+	LATIN CAPITAL LETTER D WITH SMALL LETTER Z WITH CARON (U+01C5)	feff01c5
+	LATIN SMALL LETTER DZ WITH CARON (U+01C6)	feff01c6
+	LATIN CAPITAL LETTER LJ (U+01C7)	feff01c7
+	LATIN CAPITAL LETTER L WITH SMALL LETTER J (U+01C8)	feff01c8
+	LATIN SMALL LETTER LJ (U+01C9)	feff01c9
+	LATIN CAPITAL LETTER NJ (U+01CA)	feff01ca
+	LATIN CAPITAL LETTER N WITH SMALL LETTER J (U+01CB)	feff01cb
+	LATIN SMALL LETTER NJ (U+01CC)	feff01cc
+	LATIN CAPITAL LETTER A WITH CARON (U+01CD)	feff01cd
+	LATIN SMALL LETTER A WITH CARON (U+01CE)	feff01ce
+	LATIN CAPITAL LETTER I WITH CARON (U+01CF)	feff01cf
+	LATIN SMALL LETTER I WITH CARON (U+01D0)	feff01d0
+	LATIN CAPITAL LETTER O WITH CARON (U+01D1)	feff01d1
+ǒ	LATIN SMALL LETTER O WITH CARON (U+01D2)	feff01d2
+Ǔ	LATIN CAPITAL LETTER U WITH CARON (U+01D3)	feff01d3
+ǔ	LATIN SMALL LETTER U WITH CARON (U+01D4)	feff01d4
+Ǖ	LATIN CAPITAL LETTER U WITH DIAERESIS AND MACRON (U+01D5)	feff01d5
+ǖ	LATIN SMALL LETTER U WITH DIAERESIS AND MACRON (U+01D6)	feff01d6
+Ǘ	LATIN CAPITAL LETTER U WITH DIAERESIS AND ACUTE (U+01D7)	feff01d7
+ǘ	LATIN SMALL LETTER U WITH DIAERESIS AND ACUTE (U+01D8)	feff01d8
+Ǚ	LATIN CAPITAL LETTER U WITH DIAERESIS AND CARON (U+01D9)	feff01d9
+ǚ	LATIN SMALL LETTER U WITH DIAERESIS AND CARON (U+01DA)	feff01da
+Ǜ	LATIN CAPITAL LETTER U WITH DIAERESIS AND GRAVE (U+01DB)	feff01db
+ǜ	LATIN SMALL LETTER U WITH DIAERESIS AND GRAVE (U+01DC)	feff01dc
+ǝ	LATIN SMALL LETTER TURNED E (U+01DD)	feff01dd
+Ǟ	LATIN CAPITAL LETTER A WITH DIAERESIS AND MACRON (U+01DE)	feff01de
+ǟ	LATIN SMALL LETTER A WITH DIAERESIS AND MACRON (U+01DF)	feff01df
+Ǡ	LATIN CAPITAL LETTER A WITH DOT ABOVE AND MACRON (U+01E0)	feff01e0
+ǡ	LATIN SMALL LETTER A WITH DOT ABOVE AND MACRON (U+01E1)	feff01e1
+Ǣ	LATIN CAPITAL LETTER AE WITH MACRON (U+01E2)	feff01e2
+ǣ	LATIN SMALL LETTER AE WITH MACRON (U+01E3)	feff01e3
+Ǥ	LATIN CAPITAL LETTER G WITH STROKE (U+01E4)
  * @author Connor
  */
 public class DBMS<E> {
     // These are all used for enclosing data
-    public static final char TKEY_BEG = 'ï'; // Table key
-    public static final char TKEY_END = 'ð';
-    public static final char TAB_BEG = 'ñ';  
-    public static final char TAB_END = 'ò';
-    public static final char REL_BEG = 'ó';
-    public static final char REL_END = 'õ';
-    public static final char SEP = 'ö';
-    public static final char IND_BEG = 'Θ';
-    public static final char IND_END = '÷';
-    public static final char RELT_BEG = 'ø'; // Relation table key beg
-    public static final char RELT_END = 'ù';
-    public static final char PRIME_BEG = 'ú';
-    public static final char PRIME_END = 'û';
+    /*public static final char TKEY_BEG = 'Ǆ'; // Table key
+    public static final char TKEY_END = 'ǅ';
+    public static final char TAB_BEG = 'ǆ';  
+    public static final char TAB_END = 'Ǉ';
+    public static final char REL_BEG = 'ǈ';
+    public static final char REL_END = 'ǉ';
+    public static final char SEP = 'Ǌ';
+    public static final char IND_BEG = 'ǋ';
+    public static final char IND_END = 'ǌ';
+    public static final char RELT_BEG ='Ǎ' ; // Relation table key beg
+    public static final char RELT_END = 'ǎ';
+    public static final char PRIME_BEG = 'Ǐ';
+    public static final char PRIME_END = 'ǐ';
  
-    public static final char BAD_BAD_BAD = 'ü';
-    public static final char SNEAKY_KEY = 'ý'; // Stuck into hashmaps for tables
+    public static final char BAD_BAD_BAD = 'Ǒ';
+    public static final char SNEAKY_KEY = 14; */// Stuck into hashmaps for tables
+    public static final char TKEY_BEG = 0; // Table key
+    public static final char TKEY_END = 1;
+    public static final char TAB_BEG = 2;  
+    public static final char TAB_END = 3;
+    public static final char REL_BEG = 4;
+    public static final char REL_END = 5;
+    public static final char SEP = 6;
+    public static final char IND_BEG = 7;
+    public static final char IND_END = 8;
+    public static final char RELT_BEG =9 ; // Relation table key beg
+    public static final char RELT_END = 10;
+    public static final char PRIME_BEG = 11;
+    public static final char PRIME_END = 12;
+ 
+    public static final char BAD_BAD_BAD = 'Ǒ';
+    public static final char SNEAKY_KEY = 14; 
+
+
     private final DBIO io;                     // Represents table key
     
     private final String db,index;
