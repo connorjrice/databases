@@ -38,6 +38,7 @@ public class RecordTest {
     public static void read() {
         DBMS d = new DBMS("test.db", "index.db");
         d.buildIndices();
+        d.findRecord("connor", "info");
         //d.readDB();
         //d.findRecord("info", "connor");
     }

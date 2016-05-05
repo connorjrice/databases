@@ -106,8 +106,8 @@ public class DBMS<E> {
         io.write(r.toString(), r.getPrimary(), tablekey);
     }
     
-    public <E extends Comparable<? super E>> void findRecord(String key) {
-        //io.hashLookup(key);
+    public <E extends Comparable<? super E>> void findRecord(E primarykey, String tablekey) {
+        io.hashLookup(primarykey, tablekey);
     }
     
     public <E extends Comparable<? super E>> void modifyRecord() {

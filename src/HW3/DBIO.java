@@ -104,7 +104,7 @@ public class DBIO<E> {
      * @param primary primary key, -1 for tables
      * @param tablekey key of the table
      */
-    public void write(String input, String primary, String tablekey) {
+    public void write(String input, E primary, String tablekey) {
         try {
             RandomAccessFile dbfile = rafs.get(db);
             long dbstart = positions.get(db);
@@ -149,7 +149,7 @@ public class DBIO<E> {
         return new String(hexChars);
 }        
     
-    private String getIndUTF(String primary, String tablekey) {
+    private String getIndUTF(E primary, String tablekey) {
         StringBuilder sb = new StringBuilder();
         sb.append(DBMS.IND_BEG);
         sb.append(getHash(primary, tablekey));
@@ -159,8 +159,8 @@ public class DBIO<E> {
         return sb.toString();
     }
     
-    private int getHash(String primary, String tablekey) {
-        return (primary + tablekey).hashCode();
+    private int getHash(E primary, String tablekey) {
+        return (primary.toString() + tablekey).hashCode();
     }
     
     
@@ -169,12 +169,11 @@ public class DBIO<E> {
         positions.put(ind, positions.get(ind) + indOffset);
     }
             
- 
     
     
     
-    public void hashLookup(String key, E member) {
-        System.out.println(index.get(getHash(key, member)));
+    public void hashLookup(E primary, String tablekey) {
+        System.out.println(index.get(getHash(primary, tablekey)));
     }
     
     private int getHash(String key, E member) {
@@ -250,10 +249,7 @@ public class DBIO<E> {
         String sep = " " + DBMS.SEP;
         sep = sep.substring(1);
         String[] pair = s.split(sep);
-        // pair[0] = hash, pair[1] = byte index
         index.put(Integer.parseInt(pair[0]), Long.parseLong(pair[1]));
-        System.out.println("Hash: " + pair[0] + " Byte: " + pair[1]);
-
     }
     
    /* public void writeIndex(HashMap indices) {
