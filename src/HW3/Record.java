@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Set;
 
 /**
- * TKEY_BEG*keyvalue*TKEY_END*TAB_BEG*REL_BEG*...*REL_END*TAB_END*
  * @author Connor
  * @param <E>
  */
@@ -42,8 +41,32 @@ public class Record<E> {
         return tablekey;
         
     }
-    
+    /**
+     * Returns a string with pretty formatting.
+     * Thanks OCD!
+     * @param attributes
+     * @return 
+     */
     public String toStringPretty(HashMap<E, Class<E>> attributes) {
+        StringBuilder sb = new StringBuilder();
+        String labels = "";
+        String record = "";
+        Object[] t = getTypes(attributes);
+        if (!((ArrayList<Integer>) t[1]).isEmpty()) {
+            labels = "| " + getLabels(t) + "|\n";
+            record = "| " + getRecord(t) + "|\n";
+        }
+	String border = getBorder((String) t[0]);
+        
+	sb.append(border).append("\n");
+	sb.append("| ").append((String) t[0]).append("|\n");        
+	sb.append(labels);
+	sb.append(record);
+	sb.append(border);
+        return sb.toString();
+    }
+    
+    private Object[] getTypes(HashMap<E, Class<E>> attributes) {
         StringBuilder picky = new StringBuilder();
         ArrayList<Integer> positions = new ArrayList<>();
         attributes.values().forEach((Class<E> v) -> {
@@ -51,45 +74,50 @@ public class Record<E> {
             positions.add(picky.length());
         });
         
-        String types = picky.toString();
+        if (positions.isEmpty()) {
+            picky.append("--*i got nothin'*--");
+        }
+        return new Object[]{picky.toString(),positions, attributes};
+    }
+    
+    private String getLabels(Object[] t) {
         StringBuilder sb = new StringBuilder();
         int i = 0;
-        for (String s : (Set<String>) attributes.keySet()) {
+        for (String s : ((Set<String>) ((HashMap<E, Class<E>>) t[2]).keySet())) {
             sb.append(s);            
-            for (int j = sb.length(); j < positions.get(i)-1; j++) {
+            for (int j = sb.length(); j < ((ArrayList<Integer>) t[1]).get(i); j++) {
                 sb.append(" ");
             }
             i++;
         }
-        
-        String labels = sb.toString();
-        sb = new StringBuilder();
-        i = 0;
-        if (members.length > 0 && positions.size() == members.length) {
+        return sb.toString();
+    }
+    
+    private String getRecord(Object[] t) {
+        StringBuilder sb = new StringBuilder();        
+        int i = 0;
+        // Add a class cast exception to check for tom foolery (ArrayList<Integer>t[2]).
+        // positions.size() = members.length
+        if (members.length > 0 && ((ArrayList<Integer>) t[1]).size() == members.length) {
             for (Object o : Arrays.stream(members).toArray()) {
                 sb.append(o.toString());
-                for (int j = sb.length(); j < positions.get(i)-1; j++) {
+                // Spacing
+                for (int j = sb.length(); j < ((ArrayList<Integer>) t[1]).get(i); j++) {
                     sb.append(" ");
                 }
                 i++;            
             }
         }
-        String record = sb.toString();
-        sb = new StringBuilder();
-        
-	sb.append("*-");
+        return sb.toString();
+    }
+    
+    private String getBorder(String types) {
+        StringBuilder sb = new StringBuilder();                
+        sb.append("*-");
         for (int j = 0; j < types.length(); j++) {
             sb.append("-");
         }
-
 	sb.append("*");
-	String border = sb.toString();
-	sb = new StringBuilder();
-	sb.append(border).append("\n");
-	sb.append("| ").append(types).append("|\n");        
-	sb.append("| ").append(labels).append(" |\n");
-	sb.append("| ").append(record).append(" |\n");
-	sb.append(border);
         return sb.toString();
     }
 
