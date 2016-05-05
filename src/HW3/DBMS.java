@@ -48,38 +48,22 @@ import java.util.logging.Logger;
  */
 public class DBMS<E> {
     // These are all used for enclosing data
-    /*public static final char TKEY_BEG = 'Ǆ'; // Table key
-    public static final char TKEY_END = 'ǅ';
-    public static final char TAB_BEG = 'ǆ';  
-    public static final char TAB_END = 'Ǉ';
-    public static final char REL_BEG = 'ǈ';
-    public static final char REL_END = 'ǉ';
-    public static final char SEP = 'Ǌ';
-    public static final char IND_BEG = 'ǋ';
-    public static final char IND_END = 'ǌ';
-    public static final char RELT_BEG ='Ǎ' ; // Relation table key beg
-    public static final char RELT_END = 'ǎ';
-    public static final char PRIME_BEG = 'Ǐ';
-    public static final char PRIME_END = 'ǐ';
- 
-    public static final char BAD_BAD_BAD = 'Ǒ';
-    public static final char SNEAKY_KEY = 14; */// Stuck into hashmaps for tables
-    public static final char TKEY_BEG = 'A'; // Table key
-    public static final char TKEY_END = 'B';
-    public static final char TAB_BEG = 'C';  
-    public static final char TAB_END = 'D';
-    public static final char REL_BEG = 'E';
-    public static final char REL_END = 'F';
-    public static final char SEP = 16;
-    public static final char IND_BEG = 17;
-    public static final char IND_END = 18;
-    public static final char RELT_BEG =19 ; // Relation table key beg
-    public static final char RELT_END = 20;
-    public static final char PRIME_BEG = 21;
-    public static final char PRIME_END = 22;
- 
-    public static final char BAD_BAD_BAD = 'Ǒ';
-    public static final char SNEAKY_KEY = 14; 
+    public static final char TKEY_BEG = 'Α'; // Table key
+    public static final char TKEY_END = 'Β';
+    public static final char TAB_BEG = 'Γ';  
+    public static final char TAB_END = 'Δ';
+    public static final char REL_BEG = 'Ε';
+    public static final char REL_END = 'Ζ';
+    public static final char SEP = 'Η';
+    public static final char IND_BEG = 'Θ';
+    public static final char IND_END = 'Ι';
+    public static final char RELT_BEG = 'Κ'; // Relation table key beg
+    public static final char RELT_END = 'Λ';
+    public static final char PRIME_BEG = 'Μ';
+    public static final char PRIME_END = 'Ν';
+    public static final String TABLE = "TABLE";
+    public static final char BAD_BAD_BAD = 'ѯ';
+
 
 
     private final DBIO io;                     // Represents table key

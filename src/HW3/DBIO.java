@@ -92,20 +92,9 @@ public class DBIO<E> extends Data {
             RandomAccessFile file = rafs.get(path);
             if (file.length() > 0) {
                 System.out.println("here");
-                StringBuilder sb = new StringBuilder();
-                byte[] bytes = fromHex(file.readLine());
-                String s = new String(bytes);
-                
-               /* final char[] chars = Character.toChars(0x1F701);
-                
-                final String s = new String(chars);*/
-          
-
-
-                
-
-                int type = parse(null);
-                decide(sb.toString(), type);
+                String s = new String(fromHex(file.readLine()));
+                int type = parse(s);
+                decide(s, type);
             } else {
                 Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE,
                         "{0} was empty!", path);
