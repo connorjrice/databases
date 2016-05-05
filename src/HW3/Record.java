@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
-import java.util.Spliterator;
-import java.util.function.Consumer;
 
 /**
  * TKEY_BEG*keyvalue*TKEY_END*TAB_BEG*REL_BEG*...*REL_END*TAB_END*
@@ -52,6 +50,7 @@ public class Record<E> {
             picky.append(v.getSimpleName()).append(" ");
             positions.add(picky.length());
         });
+        
         String types = picky.toString();
         StringBuilder sb = new StringBuilder();
         int i = 0;
@@ -62,21 +61,19 @@ public class Record<E> {
             }
             i++;
         }
+        
         String labels = sb.toString();
         sb = new StringBuilder();
-        //Arrays.stream(members).forEach(sb::append);
         i = 0;
-        for (Object o : Arrays.stream(members).toArray()) {
-            sb.append(o.toString());
-            for (int j = sb.length(); j < positions.get(i)-1; j++) {
-                sb.append(" ");
+        if (members.length > 0 && positions.size() == members.length) {
+            for (Object o : Arrays.stream(members).toArray()) {
+                sb.append(o.toString());
+                for (int j = sb.length(); j < positions.get(i)-1; j++) {
+                    sb.append(" ");
+                }
+                i++;            
             }
-            i++;            
         }
-        
-        
-
-
         String record = sb.toString();
         sb = new StringBuilder();
         
@@ -89,8 +86,8 @@ public class Record<E> {
 	String border = sb.toString();
 	sb = new StringBuilder();
 	sb.append(border).append("\n");
+	sb.append("| ").append(types).append("|\n");        
 	sb.append("| ").append(labels).append(" |\n");
-	sb.append("| ").append(types).append("|\n");
 	sb.append("| ").append(record).append(" |\n");
 	sb.append(border);
         return sb.toString();
@@ -108,7 +105,6 @@ public class Record<E> {
         sb.append(DBMS.PRIME_END);
         sb.append(DBMS.REL_BEG);
         for (int i = 0; i < members.length; i++) {
-
             if (i == members.length-1) {
                 sb.append(members[i].toString());
             } else {

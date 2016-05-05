@@ -20,6 +20,10 @@ public class RecordTest {
             write();
         } else if (args[0].compareTo("delete") == 0) {
             delete();
+        } else if (args[0].compareTo("full") == 0) {
+            delete();
+            write();
+            read();
         }
         
     }
@@ -32,6 +36,8 @@ public class RecordTest {
         String[] record = {"connor", "m", "23"};
         
         d.insertRecord("info", record, 0);
+        record = new String[]{"boris", "m", "2"};
+        d.insertRecord("info", record, 0);
         //d.findRecord("info", "connor");
         //d.writeDB();
     }
@@ -40,7 +46,9 @@ public class RecordTest {
         DBMS d = new DBMS("test.db", "index.db");
         d.showTables();
         d.findRecord("connor", "info");
-        
+        d.deleteRecord("connor", "info");
+        d.findRecord("boris", "info");
+        d.findRecord("connor", "info");        
         //d.readDB();
         //d.findRecord("info", "connor");
     }

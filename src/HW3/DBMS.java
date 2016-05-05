@@ -28,6 +28,7 @@ public class DBMS<E> {
     public static final char PRIME_BEG = 'Μ';
     public static final char PRIME_END = 'Ν';
     public static final String TABLE = "TABLE";
+    public static final char BAD_BAD_BAD = 'ѯ';
 
     private final DBIO io;
     
@@ -74,7 +75,7 @@ public class DBMS<E> {
     }
     
     public void getTable(String key) {
-
+        
     }
     
     
@@ -95,7 +96,8 @@ public class DBMS<E> {
         
     }
     
-    public <E extends Comparable<? super E>> void deleteRecord() {
+    public <E extends Comparable<? super E>> void deleteRecord(E primarykey, String tablekey) {
+        io.deleteRecord(primarykey, tablekey);
         
     }
     

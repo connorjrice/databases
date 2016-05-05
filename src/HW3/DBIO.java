@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -26,9 +25,9 @@ public class DBIO<E> {
     private final HashMap<String, RandomAccessFile> rafs;
     private final HashMap<String, Long> curPositions;
     
-    private static final String TABLE_INNER = "(ΒΜ)|(ΝΓ)|(Η)|(,)";
-    private static final String INDEX_INNER = "(Η)";
-    private static final String RELATION_INNER = "(ΛΜ)|(ΝΕ)|(,)";
+    private static final String TABLE_SPLIT = "(ΒΜ)|(ΝΓ)|(Η)|(,)";
+    private static final String INDEX_SPLIT = "(Η)";
+    private static final String RELATION_SPLIT = "(ΛΜ)|(ΝΕ)|(,)";
     
     private static char[] hexArray = "0123456789ABCDEF".toCharArray();
     private final HashMap<Integer, Table> tables;    
@@ -84,7 +83,7 @@ public class DBIO<E> {
     }
     
     /**
-     * Parses the index file and builds the HashMap.
+     * Parses file given my path and decides what to do with input.
      */
     private void read(String path) {
         try {
@@ -109,11 +108,6 @@ public class DBIO<E> {
         }
     }
 
-    
-    private Long[] parseIndexString(int hashCode) {
-        String[] split = index.get(hashCode).split(",");
-        return new Long[]{Long.parseLong(split[0]),Long.parseLong(split[1])};
-    }
     
     /**
      * 
@@ -191,18 +185,10 @@ public class DBIO<E> {
         return (primary.toString() + tablekey).hashCode();
     }
     
-    
-    
     private int getHash(Table t) {
         return (t.getTableKey().hashCode());
     }
-    
-    private void updatePos(long dbOffset, long indOffset) {
-        curPositions.put(db, curPositions.get(db) + dbOffset);
-        curPositions.put(ind, curPositions.get(ind) + indOffset);
-    }
-    
-    /**
+    /*
      * Return a record from the db file.
      * @param primary
      * @param tablekey
@@ -212,6 +198,34 @@ public class DBIO<E> {
         return parseRelation(parseIndexString(getHash(primary,tablekey)));
     }
     
+    protected String deleteRecord(E primary, String tablekey) {
+        Long[] bounds = parseIndexString(getHash(primary, tablekey));
+        
+        RandomAccessFile raf = rafs.get(db);
+        try {
+            raf.seek(bounds[0]);
+            while (raf.getFilePointer() < bounds[1]) {
+                raf.writeChar(DBMS.BAD_BAD_BAD);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
+            return "Failure";
+        }
+        return "Success.";
+
+    }
+    
+    private Long[] parseIndexString(int hashCode) {
+        String[] split = index.get(hashCode).split(",");
+        return new Long[]{Long.parseLong(split[0]),Long.parseLong(split[1])};
+    }        
+    
+    private void updatePos(long dbOffset, long indOffset) {
+        curPositions.put(db, curPositions.get(db) + dbOffset);
+        curPositions.put(ind, curPositions.get(ind) + indOffset);
+    }
+    
+
     private Record parseRelation(Long[] bounds) {
         Record r = null;
         try {
@@ -226,7 +240,7 @@ public class DBIO<E> {
             }
             // Trim special chars and split
             String s = sb.toString().substring(1,sb.length()-1);
-            String[] split = s.split(RELATION_INNER);
+            String[] split = s.split(RELATION_SPLIT);
             int primaryindex = -1;
             boolean found = false;
             for (int i = 2; i < split.length; i++) {
@@ -236,7 +250,7 @@ public class DBIO<E> {
                 }
             }
             r = new Record(Arrays.copyOfRange(split, 2, 5), split[0],primaryindex);
-       } catch (IOException ex) {
+        } catch (IOException ex) {
             Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
         }
        
@@ -271,12 +285,19 @@ public class DBIO<E> {
     }
     
     public HashMap<E, Class<E>> getAttributes(String tablekey) {
-        return tables.get(tablekey.hashCode()).getAttributes();
+        try {
+            HashMap<E, Class<E>> attributes = tables.get(tablekey.hashCode()).getAttributes();            
+            return attributes;
+        } catch (java.lang.NullPointerException e) {
+            return new HashMap();
+        }
+
+
     }    
     
     private void readTable(String s) {
         s = s.substring(1, s.length()-1);
-        String[] pairs = s.split(TABLE_INNER);
+        String[] pairs = s.split(TABLE_SPLIT);
         HashMap<E, Class<E>> attributes = new HashMap();
         for (int i = 2; i < pairs.length-1; i+=2) {
             try {
@@ -291,13 +312,11 @@ public class DBIO<E> {
         tables.put(getHash(t), t);
     }
     
-    private void readRelation(String s) {
-        s = s.substring(1, s.length()-1);
-    }
+
     
     private void readIndex(String s) {
         s = s.substring(1, s.length()-1); // trim special chars     
-        String[] pair = s.split(INDEX_INNER);
+        String[] pair = s.split(INDEX_SPLIT);
         index.put(Integer.parseInt(pair[0]), pair[1]);
     }
     
