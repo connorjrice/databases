@@ -29,8 +29,8 @@ public class DBMS<E> {
     public static final char PRIME_END = 'Ν';
     public static final String TABLE = "TABLE";
     public static final char BAD_BAD_BAD = 'ѯ';
-
-    private final DBIO io;
+    public static final char SNEAKY_KEY = 'ϻ'; // Stuck into hashmaps for tables
+    private final DBIO io;                     // Represents table key
     
     private final String db,index;
 
@@ -70,7 +70,7 @@ public class DBMS<E> {
     
     public void showTables() {
         for (Table t : ((Collection<Table>) io.getTables())) {
-            System.out.println(t.toStringPretty(t.getAttributes(), null));
+            System.out.println(t.toStringPretty(t.getAttributes(), null, t.getTableKey()));
         }
     }
     

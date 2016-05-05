@@ -37,8 +37,8 @@ public class Table<E extends Comparable<Table>> extends Data {
     }
     
 
-    public String toStringPretty(HashMap<E, Class<E>> attributes, E[] members, boolean table) {
-        return super.toStringPretty(attributes, null);
+    public String toStringPretty(HashMap<E, Class<E>> attributes, String primarykey) {
+        return super.toStringPretty(attributes, null, primarykey);
     }    
     
     @Override
