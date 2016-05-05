@@ -42,7 +42,7 @@ public class Table<E> {
         s += DBMS.TKEY_BEG;
         s += key;        
         s += DBMS.TKEY_END;
-        //s += "\n";
+        s += "\n";
         
         s += DBMS.TAB_BEG;
         for (Entry<E, Class<E>> e : attributes.entrySet()) {

@@ -9,18 +9,21 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.bind.DatatypeConverter;
-import org.apache.commons.codec.binary.StringUtils;
 
 /**
  *
  * @author Connor
  */
 public class DBIO<E> {
-    private String tempKey = "";    
+    private String tempKey = "";
+    private static final Set<Character> values = new HashSet<Character>(Arrays.asList(DBMS.IND_END, DBMS.REL_END, DBMS.TAB_END, DBMS.TKEY_END));
     
     public void readDB(ArrayList tables, HashMap indices) {
         tables.clear();
@@ -30,7 +33,7 @@ public class DBIO<E> {
                 StringBuilder sb = new StringBuilder();
                 char c;
                 while (raf.getFilePointer() < raf.length()) {
-                    while ((c = raf.readChar()) != '\n'){
+                    while (!values.contains(c = raf.readChar())){
                         sb.append(c);
                     }
                     decide(sb.toString().trim(), parse(sb.toString().trim()));
@@ -45,11 +48,11 @@ public class DBIO<E> {
     }
     
     private int parse(String s) {
-        if (s.startsWith("0") && s.endsWith("1")) {
+        if (s.charAt(0) == DBMS.TKEY_BEG && s.charAt(s.length()) == DBMS.TKEY_END) {
             return 0; // key
-        } else if (s.startsWith("2") && s.endsWith("3")) {
+        } else if (s.charAt(0) == DBMS.TAB_BEG && s.charAt(s.length()) == DBMS.TAB_END) {
             return 1; // table
-        } else if (s.startsWith("4") && s.endsWith("5")) {
+        } else if (s.charAt(0) == DBMS.REL_BEG && s.charAt(s.length()) == DBMS.REL_END) {
             return 2; // relation
         } else {
             return -1;   
@@ -107,6 +110,19 @@ public class DBIO<E> {
         try (RandomAccessFile raf = new RandomAccessFile("test.db", "rw")) {
             for (Table t : tables) {
                 raf.writeChars(t.toString());
+            }
+            raf.close();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public void writeIndex(HashMap indices) {
+        try (RandomAccessFile raf = new RandomAccessFile("index.db", "rw")) {
+            for(Object e : indices.entrySet()) {
+                raf.writeChars(e.toString());
             }
             raf.close();
         } catch (FileNotFoundException ex) {
