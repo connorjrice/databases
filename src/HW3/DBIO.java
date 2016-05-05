@@ -190,7 +190,7 @@ public class DBIO<E> {
         } else if (s.charAt(0) == DBMS.REL_BEG && s.indexOf(DBMS.REL_END) > 0) {
             return 2; // relation
         } else if (s.charAt(0) == DBMS.IND_BEG && s.indexOf(DBMS.IND_END) > 0) {
-            return 3;   
+            return 3; // index
         } else {
             return -1;
         }
@@ -247,7 +247,7 @@ public class DBIO<E> {
     }
     
     private void readIndex(String s) {
-        s = s.substring(2, s.length()-2); // strip out trailing and leading special chars      
+        s = s.substring(2, s.length()-1); // strip out trailing and leading special chars      
         String sep = " " + DBMS.SEP;
         sep = sep.substring(1);
         String[] pair = s.split(sep);
