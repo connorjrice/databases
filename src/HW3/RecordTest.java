@@ -8,7 +8,7 @@ public class RecordTest {
     
     public static void main(String[] args) {
         DBMS d = new DBMS("test.db", "index.db");
-        write(d);
+        //write(d);
         read(d);
     }
     
@@ -20,7 +20,7 @@ public class RecordTest {
         String[] record = {"connor", "m", "23"};
         d.insertRecord("info", record, 1);
         d.findRecord("info", "connor");
-        d.writeDB();
+        //d.writeDB();
     }
     
     public static void read(DBMS d) {
@@ -34,7 +34,7 @@ public class RecordTest {
         String[] table = {"name","sex","age"};
 //        d.createTable(table, "info");
         String[] record = {"connor", "m", "23"};
-        d.insertRecord("info", record);
+        d.insertRecord("info", record, 1);
         d.findRecord("info", "connor");
 
         /*d.insertRecord("yuliya,f,23");

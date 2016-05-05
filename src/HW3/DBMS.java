@@ -38,20 +38,20 @@ public class DBMS<E> {
         io.delete();
     }
     
-    
      /**
      * Create a new table.
      * @param attributes
      * @param key: key to find table
      */
-    public void createTable(E[] values, Class<E>[] types, String key) {
+    public <E extends Comparable<? super E>> void createTable(E[] values, 
+            Class<E>[] types, String key) {
         if (values.length == types.length) {
             HashMap<E, Class<E>> attributes = new HashMap();
             for (int i = 0; i < values.length; i++) {
                 attributes.put(values[i], types[i]);
             }
             Table t = new Table(attributes, key);
-            io.createTable(t);
+            io.write(t.toString(), db);
         } else {
             Logger.getLogger(Record.class.getName()).log(Level.SEVERE, "Table "
                     + "creation error: inequal number of values and types.");
@@ -66,35 +66,15 @@ public class DBMS<E> {
             E[] members, int primaryindex) {
         // TODO: Check to see if members matches schema
         Record r = new Record(members, tablekey, primaryindex);
-        io.insertRecord(r);
-    }
-
-    
-    private long getBytes(Object o) {
-        return (o.toString().toCharArray().length) + 2;
+        io.write(r.toString(), db);
     }
     
-    private long getBytes(Object o1, Object o2) {
-        return (o1.toString().toCharArray().length + o2.toString().toCharArray().length) + 2;
-    }
-    
-    public void findRecord(String key, E member) {
-
+    public <E extends Comparable<? super E>> void findRecord(String key, E member) {
+        io.hashLookup(key, member);
     }
     
     public void readDB() {
         io.readDB();
     }
-    
-    public void write() {
-        
-    }
-    
-    public void writeDB() {
-        io.writeDB(tableIndices);
-        io.writeIndex(index, tableIndices);
-    }
-
-
     
 }
