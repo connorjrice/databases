@@ -91,9 +91,8 @@ public class DBIO<E> extends Data {
         try {
             RandomAccessFile file = rafs.get(path);
             if (file.length() > 0) {
-                System.out.println("here");
                 String s = new String(fromHex(file.readLine()));
-                for (String parsed : s.split("\n")) {
+                for (String parsed : s.split("\\R")) {
                     int type = parse(parsed);
                     decide(parsed, type);
                 }
@@ -102,7 +101,6 @@ public class DBIO<E> extends Data {
                 Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE,
                         "{0} was empty!", path);
             }            
-            System.out.println(Arrays.toString(tables.values().toArray()));
        } catch (IOException ex) {
             Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -156,13 +154,18 @@ public class DBIO<E> extends Data {
         try {
             RandomAccessFile file = rafs.get(db);
             file.seek(bounds[0]);
-            byte[] hexbytes = new byte[Math.toIntExact(bounds[1]-bounds[0])];            
+            byte[] hexbytes = new byte[Math.toIntExact(bounds[1]-bounds[0])];
             int i = 0;
             while (file.getFilePointer() < bounds[1]) {
                 hexbytes[i] = file.readByte();
+                i++;
             }
-            String s = 
-                    "";
+            String hex = new String(hexbytes);
+            String converted = new String(fromHex(hex));
+            System.out.println(converted);
+            
+            String s = ""         ;
+
             // Trim special chars and split
             //String s = sb.toString().substring(1,sb.length()-1);
             String[] split = s.split(RELATION_SPLIT);
@@ -229,6 +232,7 @@ public class DBIO<E> extends Data {
     
     public void addTable(Table t) {
         tables.put(getHash((E) t.getPrimary(), t.getTableKey()), t);
+        write(t.toString(), (E) t.getPrimary(), t.getTableKey(), true);
     }
     
     private String getInd(E primary, String tablekey) {
@@ -240,22 +244,7 @@ public class DBIO<E> extends Data {
         sb.append(DBMS.IND_END).append('\n');
         return toHex(sb.toString());
     }
-    
-    /**
-     * I got this from StackOverflow
-     * @param bytes
-     * @return 
-     */
-    public static String toHex(byte[] bytes) {
-        char[] hexChars = new char[bytes.length * 2];
-        for ( int j = 0; j < bytes.length; j++ ) {
-            int v = bytes[j] & 0xFF;
-            hexChars[j * 2] = hexArray[v >>> 4];
-            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
-        }
-        return new String(hexChars);
-}        
-    
+
 
     
     /**
@@ -324,13 +313,12 @@ public class DBIO<E> extends Data {
             }
         }
         Table t = new Table(attributes, pairs[0], pairs[1]);
-        tables.put(getHash(t), t);
+        tables.put(getHash((E) t.getPrimary(), t.getTableKey()), t);
     }
     
 
     
     private void readIndex(String s) {
-        System.out.println(s);
         s = s.substring(1, s.length()-1); // trim special chars     
         String[] pair = s.split(INDEX_SPLIT);
         index.put(Integer.parseInt(pair[0]), pair[1]);

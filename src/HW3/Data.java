@@ -183,30 +183,11 @@ public class Data<E>  {
             return DatatypeConverter.printHexBinary(s.getBytes());
         }
 
-        //try {
-            /*if(s.length()%2==1) {
-                s = '\n'+s;
-            }*/
-            
-
-            //return DatatypeConverter.parseHexBinary(s);            
-        /*} catch (IllegalArgumentException i) {
-            Logger.getLogger(Data.class.getName()).log(Level.SEVERE,
-                        "Illegal character: ", i);            
-
-        }
-        return DatatypeConverter.parseHexBinary(s);*/
     }
         
     public static byte[] fromHex(String b) {
-       // char[] c = s.toCharArray();
-
-//       int hexToInt = Integer.parseInt(b, 16);
 
        return DatatypeConverter.parseHexBinary(b);
-
-         //return b.getBytes();
-       //return DatatypeConverter.parseHexBinary(b);
 
         
     }

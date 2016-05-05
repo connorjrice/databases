@@ -52,7 +52,8 @@ public class RecordTest {
         record = new String[]{"clara", "f", "2", "moths"};
         d.insertRecord("info", record, 0);
         record = new String[]{"yuliya", "f", "23", "ramen"};        
-        d.insertRecord("info", record, 0);       
+        d.insertRecord("info", record, 0);
+        d.findRecord("connor", "info");        
     }
     
     public static void read() {
