@@ -30,7 +30,7 @@ public class DBMS<E> {
     public static final char PRIME_END = 'Ν';
     public static final String TABLE = "TABLE";
     public static final char BAD_BAD_BAD = 'ѯ';
-    public static final char SNEAKY_KEY = 'ϻ'; // Stuck into hashmaps for tables
+    public static final char SNEAKY_KEY = 'H'; // Stuck into hashmaps for tables
     private final DBIO io;                     // Represents table key
     
     private final String db,index;

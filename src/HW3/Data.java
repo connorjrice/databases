@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.bind.DatatypeConverter;
 
 /**
@@ -171,8 +173,16 @@ public class Data<E>  {
         return sb.toString();
     }    
     
-    public static byte[] toHex(String data) {
-        return DatatypeConverter.parseHexBinary(data);
+    public static byte[] toHex(String s) {
+        if (s.length()%2 != 0) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(s.substring(0,s.length()-1));
+            sb.append('—');
+            return DatatypeConverter.parseHexBinary(sb.toString());            
+        } else {
+            return DatatypeConverter.parseHexBinary(s);            
+        }
+        
     }
     
     public static String fromHex(byte[] bytes) {
