@@ -92,14 +92,8 @@ public class DBIO<E> extends Data {
                 StringBuilder sb = new StringBuilder();
 
                 
-                sb.append(file.readLine());
-                String[] split = splitStringEvery(sb.toString(), 2);
-                System.out.println(Arrays.toString(split));                
-                Integer[] converted = new Integer[split.length];
-                for (int i = 0; i < converted.length; i++) {
-                    converted[i] = (int)  Long.parseLong("ffff8000", 16);
-                }
-                System.out.println(Arrays.toString(converted));                                
+                sb.append(fromHex(file.readUTF().getBytes()));
+                
                 
                 int type = parse(sb.toString());
                 decide(sb.toString(), type);
