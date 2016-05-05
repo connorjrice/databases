@@ -34,7 +34,6 @@ public class RecordTest {
         Class<?>[] types = {String.class, String.class, Integer.class};
         d.createTable(values, types, "info", 0);
         String[] record = {"connor", "m", "23"};
-        
         d.insertRecord("info", record, 0);
         record = new String[]{"boris", "m", "2"};
         d.insertRecord("info", record, 0);
@@ -43,7 +42,7 @@ public class RecordTest {
         record = new String[]{"yuliya", "f", "23"};        
         d.insertRecord("info", record, 0);        
         
-        d.createTable(values, types, "secrets", 0);
+        /*d.createTable(values, types, "secrets", 0);
         record = new String[]{"connor", "m", "23", "cheese"};
         
         d.insertRecord("info", record, 3);
@@ -52,16 +51,15 @@ public class RecordTest {
         record = new String[]{"clara", "f", "2", "moths"};
         d.insertRecord("info", record, 0);
         record = new String[]{"yuliya", "f", "23", "ramen"};        
-        d.insertRecord("info", record, 0);
-        d.findRecord("connor", "info");        
+        d.insertRecord("info", record, 0);    */
     }
     
     public static void read() {
         DBMS d = new DBMS("test.db", "index.db");
         d.showTables();
         d.findRecord("connor", "info");
-        System.out.println(d.deleteRecord("connor", "info"));
-        d.findRecord("connor", "info");                
+        //System.out.println(d.deleteRecord("connor", "info"));
+        //d.findRecord("connor", "info");                
         //d.findRecord("boris", "info");
 
         //d.readDB();

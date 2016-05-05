@@ -15,7 +15,6 @@ import javax.xml.bind.DatatypeConverter;
  */
 public class Data<E>  {
     private static final String NODICE = "--*i got nothin'*--";
-    private static char[] hexArray = "0123456789ABCDEF".toCharArray();    
     
     public Data() {
 

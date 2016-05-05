@@ -161,13 +161,10 @@ public class DBIO<E> extends Data {
                 i++;
             }
             String hex = new String(hexbytes);
-            String converted = new String(fromHex(hex));
-            System.out.println(converted);
+            String s = new String(fromHex(hex));
+            s = s
+                    .substring(1,s.length()-2);
             
-            String s = ""         ;
-
-            // Trim special chars and split
-            //String s = sb.toString().substring(1,sb.length()-1);
             String[] split = s.split(RELATION_SPLIT);
             int primaryindex = -1;
             boolean found = false;
