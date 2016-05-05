@@ -53,7 +53,6 @@ public class RecordTest {
     }        
     public static void hw(DBMS d) {
 
-        String[] table = {"name","sex","age"};
 //        d.createTable(table, "info");
         String[] record = {"connor", "m", "23"};
         d.insertRecord("info", record, 1);
