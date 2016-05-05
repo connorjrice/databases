@@ -254,9 +254,10 @@ public class DBIO<E> extends Data {
         return (primary.toString() + tablekey).hashCode();
     }
     
-    private int getHash(Table t) {
-        return (t.getTableKey().hashCode());
+    protected int getHash(String tablekey) {
+        return tablekey.hashCode();
     }
+    
 
     
     protected String deleteRecord(E primary, String tablekey) {
@@ -287,7 +288,7 @@ public class DBIO<E> extends Data {
     
     public HashMap<E, Class<E>> getAttributes(String tablekey) {
         try {
-            HashMap<E, Class<E>> attributes = tables.get(tablekey.hashCode()).getAttributes();            
+            HashMap<E, Class<E>> attributes = tables.get(getHash(tablekey)).getAttributes();            
             return attributes;
         } catch (java.lang.NullPointerException e) {
             return new HashMap();
@@ -310,7 +311,7 @@ public class DBIO<E> extends Data {
             }
         }
         Table t = new Table(attributes, pairs[0], pairs[1]);
-        tables.put(getHash((E) t.getPrimary(), t.getTableKey()), t);
+        tables.put(getHash(t.getTableKey()), t);
     }
     
 

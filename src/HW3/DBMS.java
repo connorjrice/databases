@@ -133,7 +133,7 @@ public class DBMS<E> {
      */
     public <E extends Comparable<? super E>> void findRecord(E primarykey, String tablekey) {
         Record r = io.hashLookup(primarykey, tablekey);
-        HashMap<E, Class<E>> attributes = io.getAttributes(r.getTableKey());
+        HashMap<E, Class<E>> attributes = io.getAttributes(tablekey);
         System.out.println(r.toStringPretty(attributes, r.getMembers(), ""));
     }
     

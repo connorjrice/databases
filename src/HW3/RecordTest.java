@@ -42,7 +42,7 @@ public class RecordTest {
         record = new String[]{"yuliya", "f", "23"};        
         d.insertRecord("info", record, 0);        
         
-        /*d.createTable(values, types, "secrets", 0);
+        d.createTable(values, types, "secrets", 0);
         record = new String[]{"connor", "m", "23", "cheese"};
         
         d.insertRecord("info", record, 3);
@@ -51,7 +51,7 @@ public class RecordTest {
         record = new String[]{"clara", "f", "2", "moths"};
         d.insertRecord("info", record, 0);
         record = new String[]{"yuliya", "f", "23", "ramen"};        
-        d.insertRecord("info", record, 0);    */
+        d.insertRecord("info", record, 0);
     }
     
     public static void read() {
