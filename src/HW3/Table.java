@@ -45,7 +45,7 @@ public class Table<E extends Comparable<Table>> extends Data {
     public String toString() {
         StringBuilder s = new StringBuilder();
         s.append(DBMS.TKEY_BEG);
-        s.append(tablekey);        
+        s.append(tablekey);
         s.append(DBMS.TKEY_END);
         s.append(DBMS.PRIME_BEG);
         s.append(primary);

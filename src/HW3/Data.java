@@ -174,12 +174,7 @@ public class Data<E>  {
     }    
     
     public static byte[] toHex(String s) {
-        if (s.length()%2 != 0) {
-            System.out.println(Arrays.toString(s.trim().getBytes()));
-            return DatatypeConverter.parseHexBinary(s.trim());            
-        } else {
-            return DatatypeConverter.parseHexBinary(s);            
-        }
+        return DatatypeConverter.parseHexBinary(s);
         
     }
     

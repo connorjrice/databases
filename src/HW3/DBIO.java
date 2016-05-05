@@ -29,6 +29,8 @@ public class DBIO<E> extends Data {
     private static final String INDEX_SPLIT = "(Η)";
     private static final String RELATION_SPLIT = "(ΛΜ)|(ΝΕ)|(,)";
     
+    private static char[] hexArray = "0123456789ABCDEF".toCharArray();
+       
 
     private final HashMap<Integer, Table> tables;    
     
@@ -213,6 +215,23 @@ public class DBIO<E> extends Data {
         sb.append(DBMS.IND_END).append('\n');
         return toHex(sb.toString());
     }
+    
+    /**
+     * I got this from StackOverflow
+     * @param bytes
+     * @return 
+     */
+    public static String toHex(byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 2];
+        for ( int j = 0; j < bytes.length; j++ ) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+        }
+        return new String(hexChars);
+}        
+    
+
     
     /**
      * Returns the hash of the primary key and tablekey.

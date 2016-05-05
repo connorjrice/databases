@@ -57,7 +57,7 @@ public class Record<E extends Comparable<? super E>> extends Data {
             if (i == members.length-1) {
                 sb.append(members[i].toString());
             } else {
-                sb.append(members[i].toString()).append(", ");                
+                sb.append(members[i].toString().concat(", "));
             }
         }
         sb.append(DBMS.REL_END).append('\n');

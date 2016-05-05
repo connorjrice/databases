@@ -10,27 +10,27 @@ import java.util.logging.Logger;
 
 
 /**
- *
+ 
  * @author Connor
  */
 public class DBMS<E> {
     // These are all used for enclosing data
-    public static final char TKEY_BEG = 'Α'; // Table key
-    public static final char TKEY_END = 'Β';
-    public static final char TAB_BEG = 'Γ';  
-    public static final char TAB_END = 'Δ';
-    public static final char REL_BEG = 'Ε';
-    public static final char REL_END = 'Ζ';
-    public static final char SEP = 'Η';
+    public static final char TKEY_BEG = 'ï'; // Table key
+    public static final char TKEY_END = 'ð';
+    public static final char TAB_BEG = 'ñ';  
+    public static final char TAB_END = 'ò';
+    public static final char REL_BEG = 'ó';
+    public static final char REL_END = 'õ';
+    public static final char SEP = 'ö';
     public static final char IND_BEG = 'Θ';
-    public static final char IND_END = 'Ι';
-    public static final char RELT_BEG = 'Κ'; // Relation table key beg
-    public static final char RELT_END = 'Λ';
-    public static final char PRIME_BEG = 'Μ';
-    public static final char PRIME_END = 'Ν';
-    public static final String TABLE = "TABLE";
-    public static final char BAD_BAD_BAD = 'ѯ';
-    public static final char SNEAKY_KEY = 'H'; // Stuck into hashmaps for tables
+    public static final char IND_END = '÷';
+    public static final char RELT_BEG = 'ø'; // Relation table key beg
+    public static final char RELT_END = 'ù';
+    public static final char PRIME_BEG = 'ú';
+    public static final char PRIME_END = 'û';
+ 
+    public static final char BAD_BAD_BAD = 'ü';
+    public static final char SNEAKY_KEY = 'ý'; // Stuck into hashmaps for tables
     private final DBIO io;                     // Represents table key
     
     private final String db,index;
