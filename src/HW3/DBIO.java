@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package HW3;
 
 import java.io.File;
@@ -12,10 +7,7 @@ import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.DatatypeConverter;
@@ -25,13 +17,12 @@ import javax.xml.bind.DatatypeConverter;
  * @author Connor
  */
 public class DBIO<E> {
-    private static final Set<Character> VALUES = new HashSet<>(Arrays.
-            asList(DBMS.IND_END, DBMS.REL_END, DBMS.TAB_END, DBMS.TKEY_END));
     private final String db, ind;
 
-    private final HashMap<Integer, Long> index;
+    // Integer = Hash, String = Long[].toString()
+    private final HashMap<Integer, String> index;
     private final HashMap<String, RandomAccessFile> rafs;
-    private final HashMap<String, Long> positions;
+    private final HashMap<String, Long> curPositions;
     
     private static final String TABLE_INNER = "(ΒΜ)|(ΝΓ)|(Η)|(,)";
     
@@ -44,7 +35,7 @@ public class DBIO<E> {
         this.db = db;
         this.ind = ind;
         this.rafs = new HashMap<>();
-        this.positions = new HashMap<>();
+        this.curPositions = new HashMap<>();
         this.tables = new ArrayList<>();        
         initialize();
     }
@@ -54,7 +45,7 @@ public class DBIO<E> {
             this.db = db;
             this.ind = ind;
             this.rafs = new HashMap<>();
-            this.positions = new HashMap<>();
+            this.curPositions = new HashMap<>();
             this.tables = new ArrayList<>();            
             if (delete) {
                 try {
@@ -67,27 +58,19 @@ public class DBIO<E> {
             }            
             initialize();
     }
-    
-    private static String getString(char[] _c) {
-        StringBuilder sb = new StringBuilder();
-        for (char c : _c) {
-            sb.append(c).append("|");
-        }
-        return sb.toString();
-    }
         
     private void initialize() {
         try {
 
             rafs.put(db, new RandomAccessFile(db, "rw"));
-            positions.put(db, rafs.get(db).length());
+            curPositions.put(db, rafs.get(db).length());
             rafs.put(ind, new RandomAccessFile(ind, "rw"));
-            positions.put(ind, rafs.get(ind).length());
+            curPositions.put(ind, rafs.get(ind).length());
             if (new File(db).exists()) {
-                parseDatabase();
+                read(db);
             }
             if(new File(ind).exists()) {
-                 parseIndices();                
+                 read(ind);                
             }            
         } catch (FileNotFoundException ex) {
             Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
@@ -99,14 +82,14 @@ public class DBIO<E> {
     /**
      * Parses the index file and builds the HashMap.
      */
-    private void parseIndices() {
+    private void read(String path) {
         try {
-            RandomAccessFile indfile = rafs.get(ind);
-            if (indfile.length() > 0) {
+            RandomAccessFile file = rafs.get(path);
+            if (file.length() > 0) {
                 StringBuilder sb = new StringBuilder();
                 char c;
-                while (indfile.getFilePointer() < indfile.length()) {
-                    while ((c=indfile.readChar()) != '\n') {
+                while (file.getFilePointer() < file.length()) {
+                    while ((c=file.readChar()) != '\n') {
                         sb.append(c);
                     }
                     int type = parse(sb.toString());
@@ -115,40 +98,17 @@ public class DBIO<E> {
                 }
             } else {
                 Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE,
-                        "Index file was empty!");
+                        "{0} was empty!", path);
             }
-            
-           
        } catch (IOException ex) {
             Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
-    private void parseDatabase() {
-        try {
-            RandomAccessFile dbfile = rafs.get(db);
-            if (dbfile.length() > 0) {
-                StringBuilder sb = new StringBuilder();
-                char c;
-                while (dbfile.getFilePointer() < dbfile.length()) {
-                    while ((c=dbfile.readChar()) != '\n') {
-                        sb.append(c);
-                    }
-                    int type = parse(sb.toString());
-                    decide(sb.toString(), type);
-                    sb = new StringBuilder();
-                }
-            } else {
-                Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE,
-                        "Database file was empty!");
-            }
-            
-           
-       } catch (IOException ex) {
-            Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    private Long[] parseIndexString(int hashCode) {
+        String[] split = index.get(hashCode).split(",");
+        return new Long[]{Long.parseLong(split[0]),Long.parseLong(split[1])};
     }
-    
     
     /**
      * 
@@ -159,15 +119,17 @@ public class DBIO<E> {
     public void write(String input, E primary, String tablekey) {
         try {
             RandomAccessFile dbfile = rafs.get(db);
-            long dbstart = positions.get(db);
+            long dbstart = curPositions.get(db);
             dbfile.seek(dbstart);
             //String s = bytesToHex(input.getBytes());
             dbfile.writeChars(input);
-            index.put(getHash(primary, tablekey), dbstart);
             long dbdiff = dbfile.getFilePointer() - dbstart;
+            index.put(getHash(primary, tablekey), (Long.toString(dbstart) + "," +
+                Long.toString(dbdiff+dbstart)));
+
             
             RandomAccessFile indfile = rafs.get(ind);
-            long indstart = positions.get(ind);
+            long indstart = curPositions.get(ind);
             indfile.seek(indstart);
             String inds = getIndUTF(primary,tablekey);
             indfile.writeChars(inds);
@@ -209,7 +171,7 @@ public class DBIO<E> {
         sb.append(DBMS.IND_BEG);
         sb.append(getHash(primary, tablekey));
         sb.append(DBMS.SEP);
-        sb.append(index.get(getHash(primary, tablekey)).toString());
+        sb.append(index.get(getHash(primary, tablekey)));
         sb.append(DBMS.IND_END).append('\n');
         return sb.toString();
     }
@@ -220,12 +182,32 @@ public class DBIO<E> {
     
     
     private void updatePos(long dbOffset, long indOffset) {
-        positions.put(db, positions.get(db) + dbOffset);
-        positions.put(ind, positions.get(ind) + indOffset);
+        curPositions.put(db, curPositions.get(db) + dbOffset);
+        curPositions.put(ind, curPositions.get(ind) + indOffset);
     }
     
     public void hashLookup(E primary, String tablekey) {
         System.out.println(index.get(getHash(primary, tablekey)));
+    }
+    
+    private Record parseRelation(long startPos, long endPos) {
+        Record r;
+        try {
+            RandomAccessFile file = rafs.get(db);
+            file.seek(startPos);
+            StringBuilder sb = new StringBuilder();            
+            char c;            
+            while (file.getFilePointer() < endPos) {
+                while ((c=file.readChar()) != '\n') {
+                    sb.append(c);                
+                }
+            }
+            System.out.println(sb.toString());
+       } catch (IOException ex) {
+            Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return null;
     }
     
     private int parse(String s) {
@@ -244,7 +226,9 @@ public class DBIO<E> {
         if (i == 0) {
             readTable(s);            
         } else if (i == 1) { 
-            readRelation(s);
+            // Relations are only parsed when they've been looked up through
+            // the hash.
+            //readRelation(s);
         } else if (i == 2) {
             readIndex(s);
         } else {
@@ -255,9 +239,7 @@ public class DBIO<E> {
     
     private void readTable(String s) {
         s = s.substring(1, s.length()-1);
-        System.out.println(s);
         String[] pairs = s.split(TABLE_INNER);
-        System.out.println(Arrays.toString(pairs));
         HashMap<E, Class<E>> attributes = new HashMap();
         for (int i = 2; i < pairs.length-1; i+=2) {
             try {
@@ -277,10 +259,9 @@ public class DBIO<E> {
     
     private void readIndex(String s) {
         s = s.substring(1, s.length()-1); // trim special chars     
-        String sep = " " + DBMS.SEP;
-        sep = sep.substring(1);
+        String sep = "(Η)";
         String[] pair = s.split(sep);
-        index.put(Integer.parseInt(pair[0]), Long.parseLong(pair[1]));
+        index.put(Integer.parseInt(pair[0]), pair[1]);
     }
     
     public ArrayList<Table> getTables() {
