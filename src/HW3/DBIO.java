@@ -162,20 +162,22 @@ public class DBIO<E> extends Data {
             }
             String hex = new String(hexbytes);
             String s = new String(fromHex(hex));
-            s = s
-                    .substring(1,s.length()-2);
-            
-            String[] split = s.split(RELATION_SPLIT);
-            int primaryindex = -1;
-            boolean found = false;
-            for (int j = 2; j < split.length; j++) {
-                if (split[1].compareTo(split[j]) == 0 & !found) {
-                    primaryindex = j-2;
-                    found = true;
+            if (s.length() > 0) {
+                s = s
+                        .substring(1,s.length()-2);
+                
+                String[] split = s.split(RELATION_SPLIT);
+                int primaryindex = -1;
+                boolean found = false;
+                for (int j = 2; j < split.length; j++) {
+                    if (split[1].compareTo(split[j]) == 0 & !found) {
+                        primaryindex = j-2;
+                        found = true;
+                    }
                 }
+                r = new Record(Arrays.copyOfRange(split, 2, 5), split[0],                    
+                        primaryindex);
             }
-            r = new Record(Arrays.copyOfRange(split, 2, 5), split[0],
-                    primaryindex);
         } catch (IOException ex) {
             Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ArithmeticException ae) {
@@ -183,6 +185,7 @@ public class DBIO<E> extends Data {
                     "HOLY COW THAT WAS A BIG ENTRY!", ae);            
 
         }
+        
        
         return r;        
     }

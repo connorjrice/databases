@@ -58,12 +58,10 @@ public class RecordTest {
         DBMS d = new DBMS("test.db", "index.db");
         d.showTables();
         d.findRecord("connor", "info");
-        //System.out.println(d.deleteRecord("connor", "info"));
-        //d.findRecord("connor", "info");                
-        //d.findRecord("boris", "info");
+        System.out.println(d.deleteRecord("connor", "info"));
+        d.findRecord("connor", "info");                
+        d.findRecord("boris", "info");
 
-        //d.readDB();
-        //d.findRecord("info", "connor");
     }
     
    

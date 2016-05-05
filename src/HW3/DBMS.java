@@ -133,8 +133,13 @@ public class DBMS<E> {
      */
     public <E extends Comparable<? super E>> void findRecord(E primarykey, String tablekey) {
         Record r = io.hashLookup(primarykey, tablekey);
-        HashMap<E, Class<E>> attributes = io.getAttributes(tablekey);
-        System.out.println(r.toStringPretty(attributes, r.getMembers(), ""));
+        if (r != null) {
+            HashMap<E, Class<E>> attributes = io.getAttributes(tablekey);
+            System.out.println(r.toStringPretty(attributes, r.getMembers(), ""));
+        } else {
+            System.out.println("Record not found.");
+        }
+
     }
     
     public <E extends Comparable<? super E>> void modifyRecord(E primarykey, String tablekey, E[] members) {

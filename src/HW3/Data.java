@@ -185,9 +185,11 @@ public class Data<E>  {
     }
         
     public static byte[] fromHex(String b) {
-
-       return DatatypeConverter.parseHexBinary(b);
-
+        try {
+            return DatatypeConverter.parseHexBinary(b);
+        } catch (IllegalArgumentException i) {
+            return new byte[0];
+        }
         
     }
     
