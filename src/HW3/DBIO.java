@@ -24,7 +24,6 @@ import javax.xml.bind.DatatypeConverter;
  * @author Connor
  */
 public class DBIO<E> {
-    private String tempKey = "";
     private static final Set<Character> VALUES = new HashSet<>(Arrays.
             asList(DBMS.IND_END, DBMS.REL_END, DBMS.TAB_END, DBMS.TKEY_END));
     private final String db, ind;
@@ -70,7 +69,7 @@ public class DBIO<E> {
             rafs.put(ind, new RandomAccessFile(ind, "rw"));
             positions.put(ind, rafs.get(ind).length());
             if (new File(db).exists()) {
-                
+                parseDatabase();
             }
             if(new File(ind).exists()) {
                  parseIndices();                
@@ -102,6 +101,31 @@ public class DBIO<E> {
             } else {
                 Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE,
                         "Index file was empty!");
+            }
+            
+           
+       } catch (IOException ex) {
+            Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void parseDatabase() {
+        try {
+            RandomAccessFile dbfile = rafs.get(db);
+            if (dbfile.length() > 0) {
+                StringBuilder sb = new StringBuilder();
+                char c;
+                while (dbfile.getFilePointer() < dbfile.length()) {
+                    while ((c=dbfile.readChar()) != '\n') {
+                        sb.append(c);
+                    }
+                    int type = parse(sb.toString());
+                    decide(sb.toString(), type);
+                    sb = new StringBuilder();
+                }
+            } else {
+                Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE,
+                        "Database file was empty!");
             }
             
            
@@ -193,65 +217,45 @@ public class DBIO<E> {
     }
     
     private int parse(String s) {
-        if (s.charAt(0) == DBMS.TKEY_BEG && s.indexOf(DBMS.TKEY_END) > 0) {
-            return 0; // key
-        } else if (s.charAt(0) == DBMS.TAB_BEG && s.indexOf(DBMS.TAB_END) > 0) {
-            return 1; // table
+        if (s.charAt(0) == DBMS.TKEY_BEG && s.indexOf(DBMS.TAB_END) > 0) {
+            return 0; // Table
         } else if (s.charAt(0) == DBMS.REL_BEG && s.indexOf(DBMS.REL_END) > 0) {
-            return 2; // relation
+            return 1; // relation
         } else if (s.charAt(0) == DBMS.IND_BEG && s.indexOf(DBMS.IND_END) > 0) {
-            return 3; // index
+            return 2; // index
         } else {
             return -1;
         }
     }
 
     private void decide(String s, int i) {
-        if (i == 0) { 
-            // s is a key, store it
-            readKey(s);
+        if (i == 0) {
+            readTable(s);            
         } else if (i == 1) { 
-            readTable(s);
-        } else if (i == 2) { // relation
             readRelation(s);
-        } else if (i == 3) {
+        } else if (i == 2) {
             readIndex(s);
-        }
-        
-        else {
+        } else {
             Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, 
                     "Parsing error: invalid decision value.");     
         }
     }
     
-    private void readKey(String s) {
-        tempKey = s;
-    }
-    
     private void readTable(String s) {
-        // Put a table together if we have a tempKey
-            if (tempKey.length() > 0) { 
-                // Fix our input so that Java doesn't throw ClassNotFound
-                //String[] pairs = fixString(s);
-                s = s.substring(1, s.length()-1);
-                String[] pairs = s.split(",");
-                HashMap<E, Class<E>> attributes = new HashMap();
-                for (String d : pairs) {
-                    String[] pair = d.split("6");
-                    pair[1] = pair[1].trim();
-                    try {
-                        Class<E> type = (Class<E>) Class.forName(pair[1]);
-                        attributes.put((E)pair[0], type);
-                    } catch (ClassNotFoundException ex) {
-                        Logger.getLogger(DBMS.class.getName())
-                                .log(Level.SEVERE, null, ex);
-                    }
-                }
-                tempKey = "";
-            } else {
-                Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE,
-                        "Parsing error: no temp key but found table.");
+        s = s.substring(1, s.length()-1);
+        String[] pairs = s.split(",");
+        HashMap<E, Class<E>> attributes = new HashMap();
+        /*for (String d : pairs) {
+            String[] pair = d.split("6");
+            pair[1] = pair[1].trim();
+            try {
+                Class<E> type = (Class<E>) Class.forName(pair[1]);
+                attributes.put((E)pair[0], type);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(DBMS.class.getName())
+                        .log(Level.SEVERE, null, ex);
             }
+        }*/
     }
     
     private void readRelation(String s) {
