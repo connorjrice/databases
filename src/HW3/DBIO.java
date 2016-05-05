@@ -7,6 +7,7 @@ import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,6 +26,8 @@ public class DBIO<E> {
     private final HashMap<String, Long> curPositions;
     
     private static final String TABLE_INNER = "(ΒΜ)|(ΝΓ)|(Η)|(,)";
+    private static final String INDEX_INNER = "(Η)";
+    private static final String RELATION_INNER = "(ΛΜ)|(ΝΕ)";
     
     private static char[] hexArray = "0123456789ABCDEF".toCharArray();
     private ArrayList<Table> tables;    
@@ -206,7 +209,11 @@ public class DBIO<E> {
                     sb.append(c);                
                 }
             }
-            System.out.println(sb.toString());
+            // Trim special chars and split
+            String s = sb.toString().substring(1,sb.length()-1);
+            String[] split = s.split(RELATION_INNER);
+            
+            System.out.println(Arrays.toString(split));
        } catch (IOException ex) {
             Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -263,8 +270,7 @@ public class DBIO<E> {
     
     private void readIndex(String s) {
         s = s.substring(1, s.length()-1); // trim special chars     
-        String sep = "(Η)";
-        String[] pair = s.split(sep);
+        String[] pair = s.split(INDEX_INNER);
         index.put(Integer.parseInt(pair[0]), pair[1]);
     }
     
