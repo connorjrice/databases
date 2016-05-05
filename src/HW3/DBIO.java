@@ -59,12 +59,24 @@ public class DBIO<E> {
             long startpos = positions.get(db);
             dbfile.seek(startpos);
             dbfile.writeUTF(input);
+            index.put(getHash(primary), startpos);
             
+            RandomAccessFile indfile = rafs.get(ind);
+            indfile.seek(indfile.length());
+            indfile.writeUTF(getIndUTF(primary));
             
             updatePos(getDBBytes(input), getIndBytes(input));
         } catch (IOException ex) {
             Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    private String getIndUTF(String primary) {
+        return getHash(primary) + DBMS.SEP + index.get(getHash(primary)).toString();
+    }
+    
+    private int getHash(String primary) {
+        return primary.hashCode();
     }
     
     private int getDBBytes(String input) {
@@ -84,6 +96,7 @@ public class DBIO<E> {
     private void delete() {
         try {
             Files.delete(Paths.get("test.db"));
+            Files.delete(Paths.get("index.db"));
         } catch (IOException ex) {
             Logger.getLogger(Record.class.getName()).log(Level.SEVERE, null, ex);
         }

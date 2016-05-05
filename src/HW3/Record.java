@@ -32,7 +32,9 @@ public class Record<E> {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
+        sb.append(DBMS.RELT_BEG);
         sb.append(tablekey);
+        sb.append(DBMS.RELT_END);
         for (int i = 0; i < members.length; i++) {
             sb.append(DBMS.REL_BEG);
             if (i == members.length-1) {

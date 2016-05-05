@@ -18,11 +18,12 @@ public class DBMS<E> {
     public static final byte TAB_END = 3;
     public static final byte REL_BEG = 4;
     public static final byte REL_END = 5;
-    public static final byte TYPE_SEP = 6;
+    public static final byte SEP = 6;
     public static final byte IND_BEG = 7;
     public static final byte IND_END = 8;
-    public static final byte PNT_ORG = 9; // Pointer origin
-    public static final byte PNT_DST = 10;// Pointer dest
+    public static final byte RELT_BEG = 9; // Relation table key beg
+    public static final byte RELT_END = 10;
+
 
     private final DBIO io;
     
@@ -68,8 +69,8 @@ public class DBMS<E> {
         io.write(r.toString(), members[primaryindex].toString());
     }
     
-    public <E extends Comparable<? super E>> void findRecord(String key, E member) {
-        io.hashLookup(key, member);
+    public <E extends Comparable<? super E>> void findRecord(String key) {
+        //io.hashLookup(key);
     }
     
     public <E extends Comparable<? super E>> void modifyRecord() {

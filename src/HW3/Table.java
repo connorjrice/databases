@@ -34,12 +34,11 @@ public class Table<E> {
         s.append(DBMS.TKEY_END);
         s.append(DBMS.TAB_BEG);
         for (Entry<E, Class<E>> e : attributes.entrySet()) {
-            s.append(e.getKey().toString()).append(DBMS.TYPE_SEP);
+            s.append(e.getKey().toString()).append(DBMS.SEP);
             String class_ = e.getValue().toString().split(" ")[1];
             s.append(class_).append(", ");
         }
         
-        s = new StringBuilder(s.substring(0,s.length()-2));
         s.append(DBMS.TAB_END);
         
         return s.toString();
