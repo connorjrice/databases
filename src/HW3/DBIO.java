@@ -85,8 +85,8 @@ public class DBIO<E> {
                     while ((c=indfile.readChar()) != '\n') {
                         sb.append(c).append(" ");
                     }
-                    System.out.println(sb.toString());
-                    System.out.println(Arrays.toString(sb.toString().getBytes()));
+                    int type = parse(sb.toString());
+                    System.out.println(type);
                 }
             } else {
                 Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, "Index file was empty!");
@@ -197,8 +197,10 @@ public class DBIO<E> {
             return 1; // table
         } else if (s.charAt(0) == DBMS.REL_BEG && s.charAt(s.length()) == DBMS.REL_END) {
             return 2; // relation
+        } else if (s.charAt(0) == DBMS.IND_BEG && s.charAt(s.length()-2) == DBMS.IND_END) {
+            return 3;   
         } else {
-            return -1;   
+            return -1;
         }
     }
 

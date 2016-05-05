@@ -27,6 +27,7 @@ public class DBMS<E> {
     public static final char PRIME_BEG = 'Μ';
     public static final char PRIME_END = 'Ν';
     
+    public  final HashMap<Character, Integer> symbols;
 
     private final DBIO io;
     
@@ -39,6 +40,8 @@ public class DBMS<E> {
         this.index = index;
         this.io = new DBIO(db, index);
         this.tables = new ArrayList<>();
+        this.symbols = new HashMap<>();
+        buildSymbols();
     }
     
     public DBMS() {
@@ -46,7 +49,24 @@ public class DBMS<E> {
         this.index = "index.db";
         this.io = new DBIO(db, index);
         this.tables = new ArrayList<>();
-
+        this.symbols = new HashMap<>();
+        buildSymbols();
+    }
+    
+    private void buildSymbols() {
+        symbols.put(TKEY_BEG, 0);
+        symbols.put(TKEY_END, 1);
+        symbols.put(TAB_BEG, 2);
+        symbols.put(TAB_END, 3);
+        symbols.put(REL_BEG, 4);
+        symbols.put(REL_END, 5);
+        symbols.put(SEP, 6);
+        symbols.put(IND_BEG, 7);
+        symbols.put(IND_END, 8);
+        symbols.put(RELT_BEG, 9);
+        symbols.put(RELT_END, 10);
+        symbols.put(PRIME_BEG, 11);        
+        symbols.put(PRIME_END, 12);                
     }
     
     
