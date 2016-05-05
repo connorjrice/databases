@@ -235,7 +235,7 @@ public class DBIO<E> {
                     found = true;
                 }
             }
-            r = new Record(Arrays.copyOfRange(split, 2, 4), split[0],primaryindex);
+            r = new Record(Arrays.copyOfRange(split, 2, 5), split[0],primaryindex);
        } catch (IOException ex) {
             Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
         }

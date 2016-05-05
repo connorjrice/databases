@@ -77,7 +77,7 @@ public class DBMS<E> {
         
     }
     
-
+    
     public <E extends Comparable<? super E>> void insertRecord(String tablekey, 
             E[] members, int primaryindex) {
         // TODO: Check to see if members matches schema
@@ -86,11 +86,10 @@ public class DBMS<E> {
     }
     
     public <E extends Comparable<? super E>> void findRecord(E primarykey, String tablekey) {
-        
         Record r = io.hashLookup(primarykey, tablekey);
-        System.out.println(r.toString());
+//        System.out.println(r.toString());
         HashMap<E, Class<E>> attributes = io.getAttributes(r.getTableKey());
-        r.toStringPretty(attributes);
+        System.out.println(r.toStringPretty(attributes));
     }
     
     public <E extends Comparable<? super E>> void modifyRecord() {
