@@ -45,7 +45,6 @@ public class DBIO<E> {
             positions.put(db, rafs.get(db).length());
             rafs.put(ind, new RandomAccessFile(ind, "rw"));
             positions.put(ind, rafs.get(ind).length());
-            buildIndices();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -74,7 +73,7 @@ public class DBIO<E> {
         }
     
     
-    private void buildIndices() {
+    public void buildIndices() {
         try {
             RandomAccessFile indfile = rafs.get(ind);
             if (indfile.length()> 0) {
@@ -247,12 +246,14 @@ public class DBIO<E> {
     }
     
     private void readIndex(String s) {
-        s = s.substring(2, s.length()-1); // strip out trailing and leading special chars      
+        s = s.substring(1, s.length()-1); // strip out trailing and leading special chars      
         String sep = " " + DBMS.SEP;
         sep = sep.substring(1);
         String[] pair = s.split(sep);
         // pair[0] = hash, pair[1] = byte index
-        System.out.println(Arrays.toString(pair));
+        index.put(Integer.parseInt(pair[0]), Long.parseLong(pair[1]));
+        System.out.println("Hash: " + pair[0] + " Byte: " + pair[1]);
+
     }
     
    /* public void writeIndex(HashMap indices) {
