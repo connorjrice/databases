@@ -115,7 +115,7 @@ public class DBIO<E> {
      * @param primary primary key, -1 for tables
      * @param tablekey key of the table
      */
-    public void write(String input, E primary, String tablekey) {
+    public void write(String input, E primary, String tablekey, boolean update) {
         try {
             RandomAccessFile dbfile = rafs.get(db);
             long dbstart = curPositions.get(db);
@@ -134,7 +134,10 @@ public class DBIO<E> {
             indfile.writeChars(inds);
             long inddiff = indfile.getFilePointer() - indstart;
             
-            updatePos(dbdiff, inddiff);
+            if (update) {
+                updatePos(dbdiff, inddiff);
+            }
+
         } catch (IOException ex) {
             Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, null, ex);
         }

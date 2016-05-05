@@ -46,7 +46,7 @@ public class RecordTest {
         DBMS d = new DBMS("test.db", "index.db");
         d.showTables();
         //d.findRecord("connor", "info");
-       // d.deleteRecord("connor", "info");
+        System.out.println(d.deleteRecord("connor", "info"));
         //d.findRecord("boris", "info");
         //d.findRecord("connor", "info");        
         //d.readDB();
@@ -62,20 +62,5 @@ public class RecordTest {
             Logger.getLogger(Record.class.getName()).log(Level.SEVERE, null, ex);
         }
     }        
-    public static void hw(DBMS d) {
 
-//        d.createTable(table, "info");
-        String[] record = {"connor", "m", "23"};
-        d.insertRecord("info", record, 1);
-        //d.findRecord("info", "connor");
-
-        /*d.insertRecord("yuliya,f,23");
-        d.insertRecord("boris,m,3");
-        d.insertRecord("clara,f,3"); 
-        d.findRecord("connor,m,24", "info");
-        //r.modifyRecord("yuliya,f,23", "yuliya,f,24");
-        //r.deleteRecord("connor,m,24");
-        d.printTableBytes();*/
-    }
-    
 }

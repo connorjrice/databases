@@ -1,6 +1,7 @@
 package HW3;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -61,7 +62,7 @@ public class DBMS<E> {
             }
             Table t = new Table(attributes, key, values[primaryindex].toString());
             io.addTable(t);
-            io.write(t.toString(), TABLE, key);
+            io.write(t.toString(), t.getTableKey(), key, true);
         } else {
             Logger.getLogger(Record.class.getName()).log(Level.SEVERE, "Table "
                     + "creation error: inequal number of values and types.");
@@ -74,17 +75,20 @@ public class DBMS<E> {
         }
     }
     
-    public void getTable(String key) {
-        
-    }
-    
     
     public <E extends Comparable<? super E>> void insertRecord(String tablekey, 
             E[] members, int primaryindex) {
         // TODO: Check to see if members matches schema
         Record r = new Record(members, tablekey, primaryindex);
-        io.write(r.toString(), r.getPrimary(), tablekey);
+        io.write(r.toString(), r.getPrimary(), tablekey, true);
     }
+    
+    public <E extends Comparable<? super E>> void insertRecord(String tablekey, 
+            E[] members, int primaryindex, boolean db) {
+        // TODO: Check to see if members matches schema
+        Record r = new Record(members, tablekey, primaryindex);
+        io.write(r.toString(), r.getPrimary(), tablekey, db);
+    }    
     
     public <E extends Comparable<? super E>> void findRecord(E primarykey, String tablekey) {
         Record r = io.hashLookup(primarykey, tablekey);
@@ -92,13 +96,22 @@ public class DBMS<E> {
         System.out.println(r.toStringPretty(attributes, r.getMembers()));
     }
     
-    public <E extends Comparable<? super E>> void modifyRecord() {
-        
+    public <E extends Comparable<? super E>> void modifyRecord(E primarykey, String tablekey, E[] members) {
+        Record r = io.hashLookup(primarykey, tablekey);
+        // Check bytes
+        if (Arrays.toString(r.getMembers()).getBytes().length == 
+                Arrays.toString(members).getBytes().length) {
+            io.write(r.toString(), r.getPrimary(), tablekey, false);
+        } else {
+            deleteRecord(primarykey, tablekey);
+            insertRecord(tablekey, members, r.getPrimaryIndex(), false);
+        }
     }
     
-    public <E extends Comparable<? super E>> void deleteRecord(E primarykey, String tablekey) {
-        io.deleteRecord(primarykey, tablekey);
-        
+
+    
+    public <E extends Comparable<? super E>> String deleteRecord(E primarykey, String tablekey) {
+        return io.deleteRecord(primarykey, tablekey);
     }
     
 }
