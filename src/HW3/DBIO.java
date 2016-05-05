@@ -83,10 +83,11 @@ public class DBIO<E> {
                 char c;
                 while (indfile.getFilePointer() < indfile.length()) {
                     while ((c=indfile.readChar()) != '\n') {
-                        sb.append(c).append(" ");
+                        sb.append(c);
                     }
                     int type = parse(sb.toString());
-                    System.out.println(type);
+                    decide(sb.toString(), type);
+                    sb = new StringBuilder();
                 }
             } else {
                 Logger.getLogger(DBIO.class.getName()).log(Level.SEVERE, "Index file was empty!");
@@ -191,13 +192,13 @@ public class DBIO<E> {
     }
     
     private int parse(String s) {
-        if (s.charAt(0) == DBMS.TKEY_BEG && s.charAt(s.length()) == DBMS.TKEY_END) {
+        if (s.charAt(0) == DBMS.TKEY_BEG && s.indexOf(DBMS.TKEY_END) > 0) {
             return 0; // key
-        } else if (s.charAt(0) == DBMS.TAB_BEG && s.charAt(s.length()) == DBMS.TAB_END) {
+        } else if (s.charAt(0) == DBMS.TAB_BEG && s.indexOf(DBMS.TAB_END) > 0) {
             return 1; // table
-        } else if (s.charAt(0) == DBMS.REL_BEG && s.charAt(s.length()) == DBMS.REL_END) {
+        } else if (s.charAt(0) == DBMS.REL_BEG && s.indexOf(DBMS.REL_END) > 0) {
             return 2; // relation
-        } else if (s.charAt(0) == DBMS.IND_BEG && s.charAt(s.length()-2) == DBMS.IND_END) {
+        } else if (s.charAt(0) == DBMS.IND_BEG && s.indexOf(DBMS.IND_END) > 0) {
             return 3;   
         } else {
             return -1;
@@ -212,7 +213,11 @@ public class DBIO<E> {
             readTable(s);
         } else if (i == 2) { // relation
             readRelation(s);
-        } else {
+        } else if (i == 3) {
+            readIndex(s);
+        }
+        
+        else {
             Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, "Parsing error: invalid decision value.");     
         }
     }
@@ -250,7 +255,15 @@ public class DBIO<E> {
         s = s.substring(1, s.length()-1);
     }
     
-    public void writeIndex(HashMap indices) {
+    private void readIndex(String s) {
+        s = s.substring(2, s.length()-2); // strip out trailing and leading special chars      
+        String sep = " " + DBMS.SEP;
+        sep = sep.substring(1);
+        String[] pair = s.split(sep);
+        System.out.println(Arrays.toString(pair));
+    }
+    
+   /* public void writeIndex(HashMap indices) {
         try (RandomAccessFile raf = new RandomAccessFile("index.db", "rw")) {
             for(Object e : indices.entrySet()) {
                 raf.writeChars(e.toString());
@@ -261,7 +274,7 @@ public class DBIO<E> {
         } catch (IOException ex) {
             Logger.getLogger(DBMS.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
+    }&*/
     
     
 }
